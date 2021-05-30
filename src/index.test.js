@@ -9,7 +9,8 @@ describe('Can instantiate a valid Twoday class', () => {
     expect(td.layoutUrl.length).toEqual(0);
     expect(td.delay).toEqual(20);
     expect(td.silent).toBeFalsy();
-    const c = td.axios.defaults.jar.store.idx['twoday.net']['/'].agreed;
+    const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
+    expect(c.key).toEqual('agreed');
     expect(c.value).toEqual('20190210a');
     expect(c.domain).toEqual('twoday.net');
     expect(c.secure).toBeTruthy();
@@ -22,7 +23,8 @@ describe('Can instantiate a valid Twoday class', () => {
     expect(td.layoutUrl.length).toEqual(0);
     expect(td.delay).toEqual(20);
     expect(td.silent).toBeFalsy();
-    const c = td.axios.defaults.jar.store.idx['twoday.xyz']['/'].agreed;
+    const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
+    expect(c.key).toEqual('agreed');
     expect(c.value).toEqual('20190210a');
     expect(c.domain).toEqual('twoday.xyz');
     expect(c.secure).toBeTruthy();
@@ -39,7 +41,8 @@ describe('Can instantiate a valid Twoday class', () => {
     expect(td.layoutUrl.length).toEqual(0);
     expect(td.delay).toEqual(40);
     expect(td.silent).toBeTruthy();
-    const c = td.axios.defaults.jar.store.idx['twoday.xyz']['/'].agreed;
+    const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
+    expect(c.key).toEqual('agreed');
     expect(c.value).toEqual('20210517b');
     expect(c.domain).toEqual('twoday.xyz');
     expect(c.secure).toBeTruthy();
