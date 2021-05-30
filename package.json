@@ -1,0 +1,32 @@
+{
+  "name": "twoday",
+  "version": "0.1.0",
+  "description": "Module to help interact with the most relevant functions of the Twoday blogger platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeonWilderness/twoday.git"
+  },
+  "keywords": [
+    "twoday"
+  ],
+  "author": "NeonWilderness",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NeonWilderness/twoday/issues"
+  },
+  "homepage": "https://github.com/NeonWilderness/twoday#readme",
+  "devDependencies": {
+    "dotenv-safe": "^8.2.0",
+    "jest": "^27.0.1"
+  },
+  "dependencies": {
+    "chalk": "^4.1.1",
+    "cheerio": "^1.0.0-rc.9",
+    "got": "^11.8.2",
+    "tough-cookie": "^4.0.0"
+  }
+}
