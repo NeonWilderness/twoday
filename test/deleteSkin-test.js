@@ -7,9 +7,9 @@ const alias = 'neonwilderness';
 const skin = 'Site.something';
 dev
   .login()
-  .then(() => dev.createSkin(alias, skin))
+  .then(() => dev.deleteSkin(alias, skin))
   .then(() => dev.isModifiedSkin(alias, skin))
   .then(result => {
-    console.log(chalk.blue(`Skin "${skin}" ${result.isModified ? 'created' : 'not found'}.`)); 
-    console.log(chalk.green('createSkin test finished.')); 
+    console.log(chalk.blue(`Confirmed: Skin "${skin}" ${result.isModified ? 'still there' : 'was deleted'}.`)); 
+    console.log(chalk.green('deleteSkin test finished.')); 
   });

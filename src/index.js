@@ -97,6 +97,32 @@ class Twoday {
     }
   }
 
+  async getValidHoptypes() {
+    if (this.validHoptypes) return this.validHoptypes;
+    try {
+      const codeUrl = 'https://gitlab.com/api/v4/projects/8966097/repository/tree?path=code&per_page=100';
+      const body = await this.got.get(codeUrl).json();
+      this.validHoptypes = body.reduce((all, item) => {
+        if (item.type === 'tree') all.push(item.name.toLowerCase());
+        return all;
+      }, []);
+      return this.validHoptypes;
+    } catch (err) {
+      console.log(chalk.red(`getValidHoptypes failed --> ${err}`));
+      process.exit(1);
+    }
+  }
+
+  async isValidHoptype(skinName) {
+    const hoptypes = await this.getValidHoptypes();
+    const skinHoptype = skinName.split('.')[0].toLowerCase();
+    return {
+      valid: hoptypes.includes(skinHoptype),
+      prototype: skinHoptype,
+      name: skinName.substr(skinHoptype.length + 1)
+    };
+  }
+
   async getModifiedSkins(alias) {
     try {
       this.checkLoggedIn();
@@ -184,30 +210,31 @@ class Twoday {
     }
   }
 
-  async getValidHoptypes() {
-    if (this.validHoptypes) return this.validHoptypes;
+  async deleteSkin(alias, skinName) {
+    this.checkLoggedIn();
     try {
-      const codeUrl = 'https://gitlab.com/api/v4/projects/8966097/repository/tree?path=code&per_page=100';
-      const body = await this.got.get(codeUrl).json();
-      this.validHoptypes = body.reduce((all, item) => {
-        if (item.type === 'tree') all.push(item.name.toLowerCase());
-        return all;
-      }, []);
-      return this.validHoptypes;
-    } catch (err) {
-      console.log(chalk.red(`getValidHoptypes failed --> ${err}`));
-      process.exit(1);
-    }
-  }
+      const { isModified, prototype, name } = await this.isModifiedSkin(alias, skinName);
+      if (!isModified) {
+        console.log(chalk.red(`Error: Sorry, skin name "${skinName}" is not a modified/deletable skin !!`));
+        process.exit(1);
+      }
 
-  async isValidHoptype(skinName) {
-    const hoptypes = await this.getValidHoptypes();
-    const skinHoptype = skinName.split('.')[0].toLowerCase();
-    return {
-      valid: hoptypes.includes(skinHoptype),
-      prototype: skinHoptype,
-      name: skinName.substr(skinHoptype.length + 1)
-    };
+      await this.getLayoutUrl(alias);
+
+      const deleteUrl = `${this.layoutUrl}/skins/${prototype}/${name}/delete`;
+      let response = await this.got.get(deleteUrl);
+      response = await this.got.post(deleteUrl, {
+        form: {
+          secretKey: this.#getSecretKey(response.body),
+          remove: 'Löschen'
+        }
+      });
+      if (!this.silent)
+        console.log(`Skin "${alias}/${skinName}" successfully deleted (statusCode=${response.statusCode}).`);
+      return response;  
+    } catch (err) {
+      console.log(chalk.red(`Error while deleting skin "${alias}/${skinName}" --> ${err}`));
+    }
   }
 
   async createSkin(alias, skinName) {
