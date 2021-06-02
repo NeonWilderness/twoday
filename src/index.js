@@ -33,8 +33,17 @@ class Twoday {
       allowGetBody: true,
       cookieJar: this.cookieJar,
       methodRewriting: false,
-      prefixUrl: this.baseUrl
+      prefixUrl: ''
     });
+  }
+
+  checkLoggedIn() {
+    try {
+      const cookies = this.cookieJar.serializeSync().cookies;
+      return cookies[2].key === 'avLoggedIn' && cookies[2].value === '1';
+    } catch (err) {
+      throw new Error(`Must login before!`);
+    }
   }
 
   delayNextPromise() {
@@ -67,7 +76,7 @@ class Twoday {
   }
 
   async login() {
-    const loginUrl = 'members/login';
+    const loginUrl = `${this.baseUrl}/members/login`;
     try {
       let response = await this.got.get(loginUrl);
       response = await this.got.post(loginUrl, {
@@ -84,14 +93,15 @@ class Twoday {
       });
       if (!this.silent) console.log(`Login to ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
     } catch (err) {
-      console.log(chalk.red(`${this.fullDomain} login failed with error: ${err}`));
+      console.log(chalk.red(`${this.fullDomain} login failed --> ${err}`));
     }
   }
 
   async getModifiedSkins(alias) {
     try {
+      this.checkLoggedIn();
       const response = await this.got.get('layout/skins/modified', {
-        prefixUrl: `${this.getAliasDomain(alias)}`,
+        prefixUrl: `${this.getAliasDomain(alias)}`
       });
       const $ = cheerio.load(response.body);
       return $('.skin>a')
@@ -101,12 +111,31 @@ class Twoday {
         })
         .get();
     } catch (err) {
-      console.log(chalk.red(`getModifiedSkins from "${alias}" failed with error: ${err}`));
+      console.log(chalk.red(`getModifiedSkins from "${alias}" failed --> ${err}`));
+    }
+  }
+
+  async isModifiedSkin(alias, skinName) {
+    try {
+      const result = await this.isValidHoptype(skinName);
+      const modifiedSkins = await this.getModifiedSkins(alias);
+
+      const filtered = modifiedSkins.filter(skin => {
+        const prototype = skin.name.split('.')[0].toLowerCase();
+        const name = skin.name.substr(prototype.length + 1);
+        return result.prototype === prototype && result.name === name;
+      });
+
+      result.isModified = !!filtered.length;
+      return result;
+    } catch (err) {
+      console.log(chalk.red(`isModifiedSkin "${alias}/${skinName}" failed --> ${err}`));
     }
   }
 
   async getLayoutUrl(alias) {
     if (this.layoutUrl) return this.layoutUrl;
+    this.checkLoggedIn();
     try {
       const response = await this.got.get('layouts/main', {
         prefixUrl: `${this.getAliasDomain(alias)}`
@@ -116,15 +145,14 @@ class Twoday {
       this.layoutUrl = this.fixURL(url.split('/').slice(0, -1).join('/'));
       return this.layoutUrl;
     } catch (err) {
-      console.log(chalk.red(`getLayoutUrl from "${alias}" failed with error: ${err}`));
+      console.log(chalk.red(`getLayoutUrl from "${alias}" failed --> ${err}`));
     }
   }
 
   async getSkin(skin) {
     try {
-      const response = await this.got.get(this.fixURL(skin.url), {
-        prefixUrl: '',
-      });
+      this.checkLoggedIn();
+      const response = await this.got.get(this.fixURL(skin.url));
       const $ = cheerio.load(response.body);
       return Object.assign(skin, {
         secretKey: $('[name="secretKey"]').val(),
@@ -134,26 +162,25 @@ class Twoday {
         module: $('[name="module"]').val(),
         title: $('[name="title"]').val(),
         description: $('[name="description"]').val(),
-        content: $('[name="skin"]').val(),
+        skin: $('[name="skin"]').val(),
         save: $('[name="save"]').val()
       });
     } catch (err) {
-      console.log(chalk.red(`getSkin "${skin.name}" failed with error: ${err}`));
+      console.log(chalk.red(`getSkin "${skin.name}" failed --> ${err}`));
     }
   }
 
   async postSkin(skin) {
     try {
+      this.checkLoggedIn();
       const data = Object.assign({}, skin);
       delete data.name;
       delete data.url;
-      delete data.content;
       return await this.got.post(skin.url, {
-        prefixUrl: '',
         form: data
       });
     } catch (err) {
-      console.log(chalk.red(`postSkin "${skin.name}" failed with error: ${err}`));
+      console.log(chalk.red(`postSkin "${skin.name}" failed --> ${err}`));
     }
   }
 
@@ -161,16 +188,14 @@ class Twoday {
     if (this.validHoptypes) return this.validHoptypes;
     try {
       const codeUrl = 'https://gitlab.com/api/v4/projects/8966097/repository/tree?path=code&per_page=100';
-      const body = await this.got.get(codeUrl, {
-        prefixUrl: '',
-      }).json();
+      const body = await this.got.get(codeUrl).json();
       this.validHoptypes = body.reduce((all, item) => {
         if (item.type === 'tree') all.push(item.name.toLowerCase());
         return all;
       }, []);
       return this.validHoptypes;
     } catch (err) {
-      console.log(chalk.red(`getValidHoptypes failed with error: ${err}`));
+      console.log(chalk.red(`getValidHoptypes failed --> ${err}`));
       process.exit(1);
     }
   }
