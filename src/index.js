@@ -126,9 +126,11 @@ class Twoday {
   async getModifiedSkins(alias) {
     try {
       this.checkLoggedIn();
+
       const response = await this.got.get('layout/skins/modified', {
         prefixUrl: `${this.getAliasDomain(alias)}`
       });
+
       const $ = cheerio.load(response.body);
       return $('.skin>a')
         .map(function (i, el) {
@@ -161,11 +163,13 @@ class Twoday {
 
   async getLayoutUrl(alias) {
     if (this.layoutUrl) return this.layoutUrl;
-    this.checkLoggedIn();
     try {
+      this.checkLoggedIn();
+
       const response = await this.got.get('layouts/main', {
         prefixUrl: `${this.getAliasDomain(alias)}`
       });
+
       const $ = cheerio.load(response.body);
       const url = $('.level2 a.active').eq(0).attr('href');
       this.layoutUrl = this.fixURL(url.split('/').slice(0, -1).join('/'));
@@ -178,7 +182,9 @@ class Twoday {
   async getSkin(skin) {
     try {
       this.checkLoggedIn();
+
       const response = await this.got.get(this.fixURL(skin.url));
+
       const $ = cheerio.load(response.body);
       return Object.assign(skin, {
         secretKey: $('[name="secretKey"]').val(),
@@ -199,9 +205,11 @@ class Twoday {
   async postSkin(skin) {
     try {
       this.checkLoggedIn();
+
       const data = Object.assign({}, skin);
       delete data.name;
       delete data.url;
+
       return await this.got.post(skin.url, {
         form: data
       });
@@ -211,13 +219,11 @@ class Twoday {
   }
 
   async deleteSkin(alias, skinName) {
-    this.checkLoggedIn();
     try {
+      this.checkLoggedIn();
+
       const { isModified, prototype, name } = await this.isModifiedSkin(alias, skinName);
-      if (!isModified) {
-        console.log(chalk.red(`Error: Sorry, skin name "${skinName}" is not a modified/deletable skin !!`));
-        process.exit(1);
-      }
+      if (!isModified) throw new Error('Skin is not a modified/deletable skin!');
 
       await this.getLayoutUrl(alias);
 
@@ -239,22 +245,16 @@ class Twoday {
 
   async createSkin(alias, skinName) {
     try {
-      // check hoptype validity against github code
       const { valid } = await this.isValidHoptype(skinName);
-      if (!valid) {
-        console.log(chalk.red(`Error: Sorry, new skin name "${skinName}" does not have a valid Hoptype !!`));
-        process.exit(1);
-      }
+      if (!valid) throw new Error(`New skin does not have a valid Hoptype!`);
 
       await this.getLayoutUrl(alias);
 
-      // get edit skin form to acquire relevant post params
       const skin = await this.getSkin({
         name: skinName,
         url: `${this.layoutUrl}/skins/edit?key=${skinName}&skinset=&action=`
       });
 
-      // post the new skin with filler content
       const newSkin = '(new skin)';
       await this.delayNextPromise();
       return await this.postSkin(
@@ -264,8 +264,8 @@ class Twoday {
           skin: `<p><!-- ${newSkin} filler text -->Bacon ipsum dolor amet minim anim duis cillum, esse aliquip non chislic leberkas rump drumstick ut. Burgdoggen hamburger bresaola turkey, chicken commodo chislic anim.</p>\n`
         })
       );
-    } catch (e) {
-      console.log(chalk.red(`An error occured while creating the new skin "${skinName}": ${e}`));
+    } catch (err) {
+      console.log(chalk.red(`An error occured while creating the new skin "${skinName}": ${err}`));
     }
   }
 }
