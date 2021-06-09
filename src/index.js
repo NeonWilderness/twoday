@@ -19,7 +19,7 @@ class Twoday {
     this.platform = platform.toLowerCase(); // dev | prod
     this.fullDomain = `twoday.${this.#getDomain()}`;
     this.baseUrl = `https://${this.fullDomain}`;
-    this.layoutUrl = '';
+    this.layoutUrl = {};
     this.delay = Math.abs(options.delay); // ms
     this.silent = options.silent; // true=no console messages
 
@@ -62,6 +62,7 @@ class Twoday {
   }
 
   getAliasDomain(alias) {
+    if (!alias) throw new Error('Alias must not be empty!');
     return `https://${alias}.${this.fullDomain}`;
   }
 
@@ -71,7 +72,6 @@ class Twoday {
   }
 
   fixURL(url) {
-    // Fix url with missing protocol b/c otherwise it will throw an error
     return url.startsWith('//') ? `https:${url}` : url;
   }
 
@@ -139,7 +139,7 @@ class Twoday {
         })
         .get();
     } catch (err) {
-      console.log(chalk.red(`getModifiedSkins from "${alias}" failed --> ${err}`));
+      throw new Error(`getModifiedSkins from "${alias}" failed --> ${err}`);
     }
   }
 
@@ -155,6 +155,7 @@ class Twoday {
       });
 
       result.isModified = !!filtered.length;
+      result.url = result.isModified ? filtered[0].url : '';
       return result;
     } catch (err) {
       console.log(chalk.red(`isModifiedSkin "${alias}/${skinName}" failed --> ${err}`));
@@ -162,7 +163,7 @@ class Twoday {
   }
 
   async getLayoutUrl(alias) {
-    if (this.layoutUrl) return this.layoutUrl;
+    if (this.layoutUrl[alias]) return this.layoutUrl[alias];
     try {
       this.checkLoggedIn();
 
@@ -172,8 +173,8 @@ class Twoday {
 
       const $ = cheerio.load(response.body);
       const url = $('.level2 a.active').eq(0).attr('href');
-      this.layoutUrl = this.fixURL(url.split('/').slice(0, -1).join('/'));
-      return this.layoutUrl;
+      this.layoutUrl[alias] = this.fixURL(url.split('/').slice(0, -1).join('/'));
+      return this.layoutUrl[alias];
     } catch (err) {
       console.log(chalk.red(`getLayoutUrl from "${alias}" failed --> ${err}`));
     }
@@ -218,6 +219,24 @@ class Twoday {
     }
   }
 
+  async updateSkin(alias, skinName, title, description, skin) {
+    try {
+      const { isModified, url } = await this.isModifiedSkin(alias, skinName);
+      if (!isModified) throw new Error('Skin does not exist yet!');
+
+      const data = await this.getSkin({
+        name: skinName,
+        url
+      });
+
+      await this.delayNextPromise();
+
+      return await this.postSkin(Object.assign(data, { title, description, skin }));
+    } catch (err) {
+      console.log(chalk.red(`An error occured while creating the new skin "${skinName}": ${err}`));
+    }
+  }
+
   async deleteSkin(alias, skinName) {
     try {
       this.checkLoggedIn();
@@ -229,6 +248,9 @@ class Twoday {
 
       const deleteUrl = `${this.layoutUrl}/skins/${prototype}/${name}/delete`;
       let response = await this.got.get(deleteUrl);
+
+      await this.delayNextPromise();
+      
       response = await this.got.post(deleteUrl, {
         form: {
           secretKey: this.#getSecretKey(response.body),
@@ -237,7 +259,7 @@ class Twoday {
       });
       if (!this.silent)
         console.log(`Skin "${alias}/${skinName}" successfully deleted (statusCode=${response.statusCode}).`);
-      return response;  
+      return response;
     } catch (err) {
       console.log(chalk.red(`Error while deleting skin "${alias}/${skinName}" --> ${err}`));
     }
@@ -250,15 +272,16 @@ class Twoday {
 
       await this.getLayoutUrl(alias);
 
-      const skin = await this.getSkin({
+      const data = await this.getSkin({
         name: skinName,
         url: `${this.layoutUrl}/skins/edit?key=${skinName}&skinset=&action=`
       });
 
-      const newSkin = '(new skin)';
       await this.delayNextPromise();
+
+      const newSkin = '(new skin)';
       return await this.postSkin(
-        Object.assign(skin, {
+        Object.assign(data, {
           title: `${skinName} ${newSkin}`,
           description: `${newSkin}`,
           skin: `<p><!-- ${newSkin} filler text -->Bacon ipsum dolor amet minim anim duis cillum, esse aliquip non chislic leberkas rump drumstick ut. Burgdoggen hamburger bresaola turkey, chicken commodo chislic anim.</p>\n`
