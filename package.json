@@ -4,7 +4,6 @@
   "description": "Module to help interact with the most relevant functions of the Twoday blogger platform",
   "main": "index.js",
   "scripts": {
-    "publish": "npm publish --access public",
     "test": "jest"
   },
   "repository": {
