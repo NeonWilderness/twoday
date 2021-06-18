@@ -1,9 +1,10 @@
 {
-  "name": "twoday",
+  "name": "@neonwilderness/twoday",
   "version": "0.1.0",
   "description": "Module to help interact with the most relevant functions of the Twoday blogger platform",
   "main": "index.js",
   "scripts": {
+    "publish": "npm publish --access public",
     "test": "jest"
   },
   "repository": {

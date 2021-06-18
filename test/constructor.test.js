@@ -89,4 +89,14 @@ describe('Can instantiate a valid Twoday class', () => {
         expect(td.layoutUrl[alias]).toBe(wantedUrl);
       })
   });
+
+  it('should return the owner/admin memberships', () => {
+    const td = new Twoday('dev', { silent: true });
+    return td.login()
+      .then(() => td.getMemberships())
+      .then(adminBlogs => {
+        console.log('adminBlogs:', adminBlogs)
+        expect(adminBlogs).toBeGreaterThan(0);
+      })
+  });
 });

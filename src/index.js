@@ -123,6 +123,30 @@ class Twoday {
     };
   }
 
+  async getMemberships() {
+    try {
+      this.checkLoggedIn();
+
+      const response = await this.got.get('members/memberships', {
+        prefixUrl: this.baseUrl
+      });
+
+      const $ = cheerio.load(response.body);
+      let adminBlogs = [];
+      $('.listItem').each((index, el) => {
+        let $el = $(el);
+        let authLevel = $el.find('.listItemLeft').text().match(/Status: (.*)\s/)[1];
+        if (authLevel === 'Owner' || authLevel === 'Administrator') {
+          adminBlogs.push($el.find('.listItemRight a').eq(0).attr('href').match(/\/\/(.*?)\.twoday\./)[1]);
+        }
+      });
+      
+      return adminBlogs;
+    } catch (err) {
+      throw new Error(`getMemberships failed --> ${err}`);
+    }
+  }
+
   async getModifiedSkins(alias) {
     try {
       this.checkLoggedIn();
