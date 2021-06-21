@@ -5,6 +5,7 @@ const assert = require('assert').strict;
 const chalk = require('chalk');
 const cheerio = require('cheerio');
 const got = require('got');
+const pkg = require('./package.json');
 const tough = require('tough-cookie');
 
 class Twoday {
@@ -35,6 +36,7 @@ class Twoday {
       methodRewriting: false,
       prefixUrl: ''
     });
+    if (!this.silent) console.log(`Twoday v${pkg.version} on ${this.platform}.`);
   }
 
   checkLoggedIn() {
