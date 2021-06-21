@@ -110,9 +110,9 @@ describe('Can work with Twoday skins', () => {
         url: result.url
       }))
       .then(data => {
-        expect(data.title).toMatch(/new skin/);
-        expect(data.description).toMatch(/new skin/);
-        return expect(data.skin).toMatch(/new skin/);
+        expect(data.title).toContain(skin);
+        expect(data.description).toContain(skin);
+        return expect(data.skin).toContain(skin);
       })
       .then(() => td.deleteSkin(alias, skin))
       .then(() => td.isModifiedSkin(alias, skin))

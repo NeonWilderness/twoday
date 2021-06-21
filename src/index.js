@@ -135,12 +135,21 @@ class Twoday {
       let adminBlogs = [];
       $('.listItem').each((index, el) => {
         let $el = $(el);
-        let authLevel = $el.find('.listItemLeft').text().match(/Status: (.*)\s/)[1];
+        let authLevel = $el
+          .find('.listItemLeft')
+          .text()
+          .match(/Status: (.*)\s/)[1];
         if (authLevel === 'Owner' || authLevel === 'Administrator') {
-          adminBlogs.push($el.find('.listItemRight a').eq(0).attr('href').match(/\/\/(.*?)\.twoday\./)[1]);
+          adminBlogs.push(
+            $el
+              .find('.listItemRight a')
+              .eq(0)
+              .attr('href')
+              .match(/\/\/(.*?)\.twoday\./)[1]
+          );
         }
       });
-      
+
       return adminBlogs;
     } catch (err) {
       throw new Error(`getMemberships failed --> ${err}`);
@@ -243,10 +252,10 @@ class Twoday {
     }
   }
 
-  async updateSkin(alias, skinName, title, description, skin) {
+  async updateSkin(alias, skinName, options) {
     try {
       const { isModified, url } = await this.isModifiedSkin(alias, skinName);
-      if (!isModified) throw new Error('Skin does not exist yet!');
+      if (!isModified) return createSkin(alias, skinName, options);
 
       const data = await this.getSkin({
         name: skinName,
@@ -255,9 +264,12 @@ class Twoday {
 
       await this.delayNextPromise();
 
-      return await this.postSkin(Object.assign(data, { title, description, skin }));
+      let response = await this.postSkin(Object.assign(data, ...options));
+      if (!this.silent)
+        console.log(`Skin "${alias}/${skinName}" successfully updated (statusCode=${response.statusCode}).`);
+      return response;
     } catch (err) {
-      console.log(chalk.red(`An error occured while creating the new skin "${skinName}": ${err}`));
+      console.log(chalk.red(`Error while creating new skin "${alias}/${skinName}" --> ${err}`));
     }
   }
 
@@ -274,7 +286,7 @@ class Twoday {
       let response = await this.got.get(deleteUrl);
 
       await this.delayNextPromise();
-      
+
       response = await this.got.post(deleteUrl, {
         form: {
           secretKey: this.#getSecretKey(response.body),
@@ -289,7 +301,7 @@ class Twoday {
     }
   }
 
-  async createSkin(alias, skinName) {
+  async createSkin(alias, skinName, options = {}) {
     try {
       const { valid } = await this.isValidHoptype(skinName);
       if (!valid) throw new Error(`New skin does not have a valid Hoptype!`);
@@ -303,16 +315,17 @@ class Twoday {
 
       await this.delayNextPromise();
 
-      const newSkin = '(new skin)';
-      return await this.postSkin(
-        Object.assign(data, {
-          title: `${skinName} ${newSkin}`,
-          description: `${newSkin}`,
-          skin: `<p><!-- ${newSkin} filler text -->Bacon ipsum dolor amet minim anim duis cillum, esse aliquip non chislic leberkas rump drumstick ut. Burgdoggen hamburger bresaola turkey, chicken commodo chislic anim.</p>\n`
-        })
-      );
+      const defaults = {
+        title: `${skinName}`,
+        description: `${skinName}`,
+        skin: `<p><!-- new skin filler text -->Bacon ipsum dolor amet minim anim duis cillum, esse aliquip non chislic leberkas rump drumstick ut. Burgdoggen hamburger bresaola turkey, chicken commodo chislic anim.</p>\n`
+      };
+      let response = await this.postSkin(Object.assign(data, defaults, options));
+      if (!this.silent)
+        console.log(`Skin "${alias}/${skinName}" successfully created (statusCode=${response.statusCode}).`);
+      return response;      
     } catch (err) {
-      console.log(chalk.red(`An error occured while creating the new skin "${skinName}": ${err}`));
+      console.log(chalk.red(`Error while creating skin "${alias}/${skinName}" --> ${err}`));
     }
   }
 }
