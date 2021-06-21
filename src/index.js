@@ -5,7 +5,7 @@ const assert = require('assert').strict;
 const chalk = require('chalk');
 const cheerio = require('cheerio');
 const got = require('got');
-const pkg = require('./package.json');
+const pkg = require('../package.json');
 const tough = require('tough-cookie');
 
 class Twoday {
