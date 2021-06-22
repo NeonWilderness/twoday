@@ -54,7 +54,8 @@ declare class Twoday {
   async getLayoutUrl(alias: string): string;
   async getSkin(skin: tSkin): tSkin;
   async postSkin(skin: tSkin): Response;
+  #validateOptions(options: tSkinOptions): void;
   async updateSkin(alias: string, skinName: string, options: tSkinOptions): Response;
   async deleteSkin(alias: string, skinName: string): Response;
-  async createSkin(alias: string, skinName: string, options: tSkinOptions): Response;
+  async createSkin(alias: string, skinName: string, options?: tSkinOptions): Response;
 }

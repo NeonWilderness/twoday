@@ -226,7 +226,8 @@ class Twoday {
     try {
       this.checkLoggedIn();
 
-      const response = await this.got.get(this.fixURL(skin.url));
+      skin.url = this.fixURL(skin.url);
+      const response = await this.got.get(skin.url);
 
       const $ = cheerio.load(response.body);
       return Object.assign(skin, {
@@ -261,8 +262,18 @@ class Twoday {
     }
   }
 
+  #validateOptions(options) {
+    assert.ok(typeof options === 'object', 'Options must be an object!');
+    assert.ok(
+      Object.keys(options).filter(key => !['title', 'description', 'skin'].includes(key)).length === 0,
+      'Invalid option key!'
+    );
+  }
+
   async updateSkin(alias, skinName, options) {
     try {
+      this.#validateOptions(options);
+
       const { isModified, url } = await this.isModifiedSkin(alias, skinName);
       if (!isModified) return createSkin(alias, skinName, options);
 
@@ -273,7 +284,7 @@ class Twoday {
 
       await this.delayNextPromise();
 
-      let response = await this.postSkin(Object.assign(data, ...options));
+      let response = await this.postSkin(Object.assign(data, options));
       if (!this.silent)
         console.log(`Skin "${alias}/${skinName}" successfully updated (statusCode=${response.statusCode}).`);
       return response;
@@ -312,6 +323,8 @@ class Twoday {
 
   async createSkin(alias, skinName, options = {}) {
     try {
+      this.#validateOptions(options);
+
       const { valid } = await this.isValidHoptype(skinName);
       if (!valid) throw new Error(`New skin does not have a valid Hoptype!`);
 
