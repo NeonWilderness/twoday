@@ -1,6 +1,6 @@
 {
   "name": "@neonwilderness/twoday",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Module to help interact with the most relevant functions of the Twoday blogger platform",
   "main": "src/index.js",
   "types": "types/index.d.ts",

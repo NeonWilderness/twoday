@@ -78,9 +78,13 @@ class Twoday {
   }
 
   async login() {
-    const loginUrl = `${this.baseUrl}/members/login`;
     try {
+      if (typeof process.env.USER === 'undefined' || typeof process.env.PASSWORD === 'undefined')
+        throw new Error('Missing Twoday credentials in process.env.USER/PASSWORD');
+
+      const loginUrl = `${this.baseUrl}/members/login`;
       let response = await this.got.get(loginUrl);
+
       response = await this.got.post(loginUrl, {
         form: {
           secretKey: this.#getSecretKey(response.body),
@@ -93,6 +97,7 @@ class Twoday {
           login: 'Anmelden'
         }
       });
+
       if (!this.silent) console.log(`Login to ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
     } catch (err) {
       console.log(chalk.red(`${this.fullDomain} login failed --> ${err}`));
