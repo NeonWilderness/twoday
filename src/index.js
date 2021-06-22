@@ -167,7 +167,9 @@ class Twoday {
       });
 
       const $ = cheerio.load(response.body);
-      return $('.skin>a')
+      const modSkins = $('.skin>a');
+      if (!modSkins) return [];
+      return modSkins
         .map(function (i, el) {
           const $el = $(el);
           return { name: $el.attr('name'), url: $el.attr('href') };
@@ -325,7 +327,7 @@ class Twoday {
       let response = await this.postSkin(Object.assign(data, defaults, options));
       if (!this.silent)
         console.log(`Skin "${alias}/${skinName}" successfully created (statusCode=${response.statusCode}).`);
-      return response;      
+      return response;
     } catch (err) {
       console.log(chalk.red(`Error while creating skin "${alias}/${skinName}" --> ${err}`));
     }
