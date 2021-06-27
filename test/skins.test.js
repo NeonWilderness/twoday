@@ -1,12 +1,13 @@
 const Twoday = require('../src/index');
 require('dotenv-safe').config();
 
+jest.setTimeout(10000);
 const td = new Twoday('dev', { silent: true });
 const alias = 'neonwilderness';
 
 describe('Can work with Twoday skins', () => {
   it('should throw when login is missing', () => {
-    expect(() => td.getModifiedSkins(alias)).rejects.toThrow();
+    return expect(() => td.getModifiedSkins(alias)).rejects.toThrow();
   });
 
   it('should return a modified skins array', () => {
@@ -112,9 +113,9 @@ describe('Can work with Twoday skins', () => {
       .then(data => {
         expect(data.title).toContain(skin);
         expect(data.description).toContain(skin);
-        return expect(data.skin).toContain(skin);
+        expect(data.skin).toContain(skin);
+        return td.deleteSkin(alias, skin);
       })
-      .then(() => td.deleteSkin(alias, skin))
       .then(() => td.isModifiedSkin(alias, skin))
       .then(result => expect(result.isModified).toBeFalsy())
   });

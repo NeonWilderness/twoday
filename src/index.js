@@ -328,11 +328,11 @@ class Twoday {
       const { valid } = await this.isValidHoptype(skinName);
       if (!valid) throw new Error(`New skin does not have a valid Hoptype!`);
 
-      await this.getLayoutUrl(alias);
+      const layoutUrl = await this.getLayoutUrl(alias);
 
       const data = await this.getSkin({
         name: skinName,
-        url: `${this.layoutUrl}/skins/edit?key=${skinName}&skinset=&action=`
+        url: `${layoutUrl}/skins/edit?key=${skinName}&skinset=&action=`
       });
 
       await this.delayNextPromise();

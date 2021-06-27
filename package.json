@@ -1,11 +1,12 @@
 {
   "name": "@neonwilderness/twoday",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Module to help interact with the most relevant functions of the Twoday blogger platform",
   "main": "src/index.js",
   "types": "types/index.d.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "testhandles": "jest --detectOpenHandles"
   },
   "repository": {
     "type": "git",

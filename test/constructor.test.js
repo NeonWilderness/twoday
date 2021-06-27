@@ -1,5 +1,6 @@
 const Twoday = require('../src/index.js');
 require('dotenv-safe').config();
+jest.setTimeout(10000);
 
 describe('Can instantiate a valid Twoday class', () => {
   it('should work with platform=prod', () => {
@@ -19,14 +20,14 @@ describe('Can instantiate a valid Twoday class', () => {
   });
 
   it('should work with platform=dev', () => {
-    const td = new Twoday('dev');
+    const td = new Twoday('dev', { silent: true });
     expect(td.platform).toBe('dev');
     expect(td.fullDomain).toBe('twoday.xyz');
     expect(td.baseUrl).toBe('https://twoday.xyz');
     expect(typeof td.layoutUrl).toBe('object');
     expect(Object.keys(td.layoutUrl)).toHaveLength(0);
     expect(td.delay).toBe(20);
-    expect(td.silent).toBeFalsy();
+    expect(td.silent).toBeTruthy();
     const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
     expect(c.key).toBe('agreed');
     expect(c.value).toBe('20190210a');
@@ -54,13 +55,13 @@ describe('Can instantiate a valid Twoday class', () => {
   });
 
   it('should respect private methods', () => {
-    const td = new Twoday('dev');
+    const td = new Twoday('dev', { silent: true });
     expect(() => td.getDomain()).toThrow();
     expect(() => td.getSecretKey()).toThrow();
   });
 
   it('should get proper DEV alias domains', () => {
-    const td = new Twoday('dev');
+    const td = new Twoday('dev', { silent: true });
     expect(td.getAliasDomain('neonwilderness')).toBe('https://neonwilderness.twoday.xyz');
     expect(td.getAliasDomain('info')).toBe('https://info.twoday.xyz');
     expect(() => td.getAliasDomain('')).toThrow();
@@ -68,7 +69,7 @@ describe('Can instantiate a valid Twoday class', () => {
   });
 
   it('should get proper PROD alias domains', () => {
-    const td = new Twoday('prod');
+    const td = new Twoday('prod', { silent: true });
     expect(td.getAliasDomain('neonwilderness')).toBe('https://neonwilderness.twoday.net');
     expect(td.getAliasDomain('info')).toBe('https://info.twoday.net');
     expect(() => td.getAliasDomain('')).toThrow();
@@ -76,9 +77,9 @@ describe('Can instantiate a valid Twoday class', () => {
   });
 
   it('should save/return the layoutUrl of an alias', () => {
-    const td = new Twoday('dev', { silent: true });
+    const td = new Twoday('prod', { silent: true });
     const alias = 'neonwilderness';
-    const wantedUrl = 'https://neonwilderness.twoday.xyz/layouts/rainy';
+    const wantedUrl = 'https://neonwilderness.twoday.net/layouts/rainy';
     return td.login()
       .then(() => td.getLayoutUrl(alias))
       .then(url => {
@@ -91,12 +92,12 @@ describe('Can instantiate a valid Twoday class', () => {
   });
 
   it('should return the owner/admin memberships', () => {
-    const td = new Twoday('dev', { silent: true });
+    const td = new Twoday('prod', { silent: true });
     return td.login()
       .then(() => td.getMemberships())
       .then(adminBlogs => {
-        console.log('adminBlogs:', adminBlogs)
-        expect(adminBlogs).toBeGreaterThan(0);
+        expect(Array.isArray(adminBlogs)).toBeTruthy();
+        expect(adminBlogs.length).toBeGreaterThan(0);
       })
   });
 });

@@ -1,5 +1,6 @@
 const Twoday = require('../src/index');
 require('dotenv-safe').config();
+jest.setTimeout(10000);
 
 describe('Can login and receive/store all necessary cookies', () => {
   it('should login to dev and get/store the relevant cookies', () => {
@@ -35,5 +36,4 @@ describe('Can login and receive/store all necessary cookies', () => {
         expect(cookies[5].key).toBe('avPw');
       });
   });
-
 });
