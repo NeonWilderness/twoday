@@ -4,6 +4,8 @@
 const assert = require('assert').strict;
 const chalk = require('chalk');
 const cheerio = require('cheerio');
+const FormData = require('form-data');
+const fs = require('fs');
 const got = require('got');
 const pkg = require('../package.json');
 const tough = require('tough-cookie');
@@ -348,6 +350,55 @@ class Twoday {
       return response;
     } catch (err) {
       console.log(chalk.red(`Error while creating skin "${alias}/${skinName}" --> ${err}`));
+    }
+  }
+
+  async deleteFile(alias, fileName) {
+    try {
+      this.checkLoggedIn();
+
+      const deleteUrl = `${this.getAliasDomain(alias)}/files/${fileName}/delete`;
+      let response = await this.got.get(deleteUrl);
+
+      await this.delayNextPromise();
+
+      response = await this.got.post(deleteUrl, {
+        form: {
+          secretKey: this.#getSecretKey(response.body),
+          remove: 'Löschen'
+        }
+      });
+      if (!this.silent)
+        console.log(`File "${alias}/${fileName}" successfully deleted (statusCode=${response.statusCode}).`);
+      return response;
+    } catch (err) {
+      console.log(chalk.red(`Error while deleting file "${alias}/${fileName}" --> ${err}`));
+    }
+  }
+
+  async createFile(alias, file) {
+    try {
+      this.checkLoggedIn();
+
+      const createUrl = `${this.getAliasDomain(alias)}/files/create`;
+      let response = await this.got.get(createUrl);
+
+      await this.delayNextPromise();
+
+      const form = new FormData();
+      form.append('secretKey', this.#getSecretKey(response.body));
+      form.append('rawfile', fs.createReadStream(file.path));
+      form.append('alias', file.name);
+      form.append('description', file.description);
+      form.append('save', 'Sichern');
+      response = await this.got.post(createUrl, {
+        body: form
+      });
+      if (!this.silent)
+        console.log(`File "${alias}/${file.name}" successfully created (statusCode=${response.statusCode}).`);
+      return response;
+    } catch (err) {
+      console.log(chalk.red(`Error while creating file "${alias}/${file.name}" --> ${err}`));
     }
   }
 }

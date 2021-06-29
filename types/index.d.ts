@@ -1,9 +1,9 @@
 type tPlatform = 'dev' | 'prod';
 
 interface tUserOptions {
-  delay?: number = 20;
-  agreedVersion?: string = '20190210a';
-  silent?: boolean = false;
+  delay?: number;
+  agreedVersion?: string;
+  silent?: boolean;
 }
 interface tIsValidHoptype {
   valid: boolean;
@@ -21,20 +21,27 @@ interface tModifiedSkin {
 interface tSkin {
   name: string;
   url: string;
-  secretKey?: string;
-  action?: string;
-  key?: string;
-  skinset?: string;
-  module?: string;
-  title?: string;
-  description?: string;
-  skin?: string;
-  save?: string;
+}
+interface tSkinEnriched extends tSkin {
+  secretKey: string;
+  action: string;
+  key: string;
+  skinset: string;
+  module: string;
+  title: string;
+  description: string;
+  skin: string;
+  save: string;
 }
 interface tSkinOptions {
   title?: string;
   description?: string;
   skin?: string;
+}
+interface tFileInfo {
+  name: string;
+  path: string;
+  description: string;
 }
 
 declare class Twoday {
@@ -45,17 +52,21 @@ declare class Twoday {
   getAliasDomain(alias: string): string;
   #getSecretKey(data: string): string;
   fixURL(url: string): string;
-  async login(): void;
-  async getValidHoptypes(): string[];
-  async isValidHoptype(skinName: string): tIsValidHoptype;
-  async getMemberships(): string[];
-  async getModifiedSkins(alias: string): tModifiedSkin;
-  async isModifiedSkin(alias: string, skinName: string): tIsModifiedSkin;
-  async getLayoutUrl(alias: string): string;
-  async getSkin(skin: tSkin): tSkin;
-  async postSkin(skin: tSkin): Response;
+  login(): void;
+  getValidHoptypes(): Promise<string[]>;
+  isValidHoptype(skinName: string): Promise<tIsValidHoptype>;
+  getMemberships(): Promise<string[]>;
+  // skins
+  getModifiedSkins(alias: string): Promise<tModifiedSkin>;
+  isModifiedSkin(alias: string, skinName: string): Promise<tIsModifiedSkin>;
+  getLayoutUrl(alias: string): Promise<string>;
+  getSkin(skin: tSkin): Promise<tSkinEnriched>;
+  postSkin(skin: tSkinEnriched): Promise<Response>;
   #validateOptions(options: tSkinOptions): void;
-  async updateSkin(alias: string, skinName: string, options: tSkinOptions): Response;
-  async deleteSkin(alias: string, skinName: string): Response;
-  async createSkin(alias: string, skinName: string, options?: tSkinOptions): Response;
+  updateSkin(alias: string, skinName: string, options: tSkinOptions): Promise<Response>;
+  deleteSkin(alias: string, skinName: string): Promise<Response>;
+  createSkin(alias: string, skinName: string, options?: tSkinOptions): Promise<Response>;
+  // files
+  deleteFile(alias: string, fileName: string): Promise<Response>;
+  createFile(alias: string, file: tFileInfo): Promise<Response>;
 }
