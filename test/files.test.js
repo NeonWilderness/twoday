@@ -28,4 +28,23 @@ describe('Can work with Twoday files', () => {
       .then(() => td.createFile(alias, file))
       .then(() => td.deleteFile(alias, file.name));
   });
+
+  it('should check file existence', () => {
+    return td.login()
+      .then(() => td.hasFile(alias, 'eugene'))
+      .then(exists => {
+        expect(exists).toBeTruthy();
+        return td.hasFile(alias, 'nonexistentfile');
+      })
+      .then(exists => expect(exists).toBeFalsy());
+  });
+
+  it('should retrieve a list of files', () => {
+    return td.login()
+      .then(() => td.listFiles(alias))
+      .then(files => {
+        expect(Array.isArray(files)).toBeTruthy();
+        expect(files.length).toBeGreaterThan(60);
+      });
+  });
 });

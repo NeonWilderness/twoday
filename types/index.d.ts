@@ -67,6 +67,9 @@ declare class Twoday {
   deleteSkin(alias: string, skinName: string): Promise<Response>;
   createSkin(alias: string, skinName: string, options?: tSkinOptions): Promise<Response>;
   // files
+  listFiles(alias: string): Promise<string[]>;
+  hasFile(alias: string, fileName: string): Promise<boolean>;
   deleteFile(alias: string, fileName: string): Promise<Response>;
   createFile(alias: string, file: tFileInfo): Promise<Response>;
+  updateFile(alias: string, file: tFileInfo): Promise<Response>;
 }

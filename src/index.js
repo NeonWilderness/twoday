@@ -353,6 +353,51 @@ class Twoday {
     }
   }
 
+  async listFiles(alias) {
+    const returnFilesOnPage = $$ =>
+      $$('.listItem b')
+        .map((i, el) => $$(el).text())
+        .get();
+
+    try {
+      this.checkLoggedIn();
+
+      const filesUrl = `${this.getAliasDomain(alias)}/files/?page=`;
+
+      let response = await this.got.get(`${filesUrl}0`);
+      let $ = cheerio.load(response.body);
+      let allFiles = returnFilesOnPage($);
+      let maxPage = 0;
+      const $pageNav = $('.pageNavSummary:first'); // e.g. "zeige 1-20 (von 70)"
+      if ($pageNav) {
+        const totalFiles = parseInt($pageNav.text().split(' ').pop());
+        maxPage = Math.floor(totalFiles / 20);
+      }
+
+      for (let page = 1; page <= maxPage; page++) {
+        await this.delayNextPromise();
+        response = await this.got.get(`${filesUrl}${page}`);
+        allFiles = allFiles.concat(returnFilesOnPage(cheerio.load(response.body)));
+      }
+      return allFiles;
+    } catch (err) {
+      console.log(chalk.red(`Error while getting the files list of "${alias}" --> ${err}`));
+      return [];
+    }
+  }
+
+  async hasFile(alias, fileName) {
+    try {
+      this.checkLoggedIn();
+
+      const fileUrl = `${this.getAliasDomain(alias)}/files/${fileName}`;
+      await this.got.get(fileUrl);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
   async deleteFile(alias, fileName) {
     try {
       this.checkLoggedIn();
@@ -399,6 +444,16 @@ class Twoday {
       return response;
     } catch (err) {
       console.log(chalk.red(`Error while creating file "${alias}/${file.name}" --> ${err}`));
+    }
+  }
+
+  async updateFile(alias, file) {
+    try {
+      const fileExists = await this.hasFile(alias, file.name);
+      if (fileExists) await this.deleteFile(alias, file.name);
+      await this.createFile(alias, file);
+    } catch (err) {
+      console.log(chalk.red(`Error while updating file "${alias}/${file.name}" --> ${err}`));
     }
   }
 }
