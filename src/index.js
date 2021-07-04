@@ -456,6 +456,33 @@ class Twoday {
       console.log(chalk.red(`Error while updating file "${alias}/${file.name}" --> ${err}`));
     }
   }
+
+  async downloadLayout(alias, layout) {
+    try {
+      this.checkLoggedIn();
+
+      const downloadUrl = `${this.getAliasDomain(alias)}/layouts/${layout.name}/download`;
+      let response = await this.got.get(downloadUrl);
+
+      await this.delayNextPromise();
+
+      response = await this.got.post(downloadUrl, {
+        form: {
+          secretKey: this.#getSecretKey(response.body),
+          changesonly: 'Nur Änderungen'
+        }
+      });
+
+      const zip = fs.createWriteStream(layout.path);
+      zip.write(response.rawBody);
+      zip.end();
+
+      if (!this.silent) console.log(`Layout "${alias}/${layout.name}" successfully downloaded.`);
+      return true;
+    } catch (err) {
+      console.log(chalk.red(`Error while downloading layout "${alias}/${layout.name}" --> ${err}`));
+    }
+  }
 }
 
 module.exports = Twoday;

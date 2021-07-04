@@ -43,6 +43,10 @@ interface tFileInfo {
   path: string;
   description: string;
 }
+interface tLayoutInfo {
+  name: string;
+  path: string;
+}
 
 declare class Twoday {
   constructor(platform: tPlatform, userOptions?: tUserOptions);
@@ -72,4 +76,6 @@ declare class Twoday {
   deleteFile(alias: string, fileName: string): Promise<Response>;
   createFile(alias: string, file: tFileInfo): Promise<Response>;
   updateFile(alias: string, file: tFileInfo): Promise<Response>;
+  // layout
+  downloadLayout(alias: string, layout: tLayoutInfo): Promise<Response>;
 }

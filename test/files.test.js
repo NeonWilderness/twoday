@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 const Twoday = require('../src/index');
 require('dotenv-safe').config();
