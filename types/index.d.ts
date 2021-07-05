@@ -47,6 +47,7 @@ interface tLayoutInfo {
   name: string;
   path: string;
 }
+type tAlienVersion = string | 'N/A';
 
 declare class Twoday {
   constructor(platform: tPlatform, userOptions?: tUserOptions);
@@ -78,4 +79,6 @@ declare class Twoday {
   updateFile(alias: string, file: tFileInfo): Promise<Response>;
   // layout
   downloadLayout(alias: string, layout: tLayoutInfo): Promise<Response>;
+  // special
+  checkUserAlienVersion(alias: string): Promise<tAlienVersion>;
 }

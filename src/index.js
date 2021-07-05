@@ -483,6 +483,17 @@ class Twoday {
       console.log(chalk.red(`Error while downloading layout "${alias}/${layout.name}" --> ${err}`));
     }
   }
+
+  async checkUserAlienVersion(alias) {
+    try {
+      let response = await this.got.get(`${this.getAliasDomain(alias)}`);
+      let $ = cheerio.load(response.body);
+      let el = $('body')[0];
+      return el.attribs['data-version'] || 'N/A';
+    } catch (err) {
+      console.log(chalk.red(`Error while checking alien version of "${alias}" --> ${err}`));
+    }
+  }
 }
 
 module.exports = Twoday;
