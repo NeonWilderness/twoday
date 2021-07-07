@@ -47,6 +47,17 @@ interface tLayoutInfo {
   name: string;
   path: string;
 }
+type tStoryID = string | number;
+type tStoryAction = 'save' | 'publish';
+interface tStoryInfo {
+  title: string;
+  body: string;
+  id?: tStoryID;
+  niceurl?: string;
+  topic?: string;
+  publish?: string;
+  action?: tStoryAction;
+}
 type tAlienVersion = string | 'N/A';
 
 declare class Twoday {
@@ -57,7 +68,7 @@ declare class Twoday {
   getAliasDomain(alias: string): string;
   #getSecretKey(data: string): string;
   fixURL(url: string): string;
-  login(): void;
+  login(): Promise<Response>;
   getValidHoptypes(): Promise<string[]>;
   isValidHoptype(skinName: string): Promise<tIsValidHoptype>;
   getMemberships(): Promise<string[]>;
@@ -77,6 +88,10 @@ declare class Twoday {
   deleteFile(alias: string, fileName: string): Promise<Response>;
   createFile(alias: string, file: tFileInfo): Promise<Response>;
   updateFile(alias: string, file: tFileInfo): Promise<Response>;
+  // stories
+  hasStory(alias: string, id: string): Promise<boolean>;
+  createStory(alias: string, story: tStoryInfo): Promise<Response>;
+  updateStory(alias: string, story: tStoryInfo): Promise<Response>;
   // layout
   downloadLayout(alias: string, layout: tLayoutInfo): Promise<Response>;
   // special

@@ -101,6 +101,7 @@ class Twoday {
       });
 
       if (!this.silent) console.log(`Login to ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
+      return response;
     } catch (err) {
       console.log(chalk.red(`${this.fullDomain} login failed --> ${err}`));
     }
@@ -454,6 +455,137 @@ class Twoday {
       await this.createFile(alias, file);
     } catch (err) {
       console.log(chalk.red(`Error while updating file "${alias}/${file.name}" --> ${err}`));
+    }
+  }
+
+  getNiceUrl(url) {
+    url = url.toLowerCase();
+    url = url.replace(/ü/g, 'ue');
+    url = url.replace(/ä/g, 'ae');
+    url = url.replace(/ö/g, 'oe');
+    url = url.replace(/Ü/g, 'Ue');
+    url = url.replace(/Ä/g, 'Ae');
+    url = url.replace(/Ö/g, 'Oe');
+    url = url.replace(/ß/g, 'ss');
+    url = url.replace(/[^a-z0-9 -]/g, '');
+    url = url.replace(/\s/g, '-');
+    url = url.replace(/-+/g, '-');
+    // max 70 Chars
+    url = url.substring(0, 70);
+    // remove - from start and end of String because not very nice
+    url = url.replace(/^-/, '');
+    url = url.replace(/-$/, '');
+    return url;
+  }
+
+  #validateStory(story) {
+    assert.ok(typeof story === 'object', 'Story param must be an object!');
+    assert.ok(
+      Object.keys(story).filter(key => !['title', 'niceurl', 'body', 'id', 'topic', 'publish', 'action'].includes(key))
+        .length === 0,
+      'Invalid story param key!'
+    );
+    assert.ok(story.title, 'Story title must not be empty!');
+    story.niceurl = this.getNiceUrl(story.niceurl ? story.niceurl : story.title);
+
+    if (story.action) assert.ok(['save', 'publish'].includes(story.action));
+    else story.action = 'save';
+  }
+
+  async hasStory(alias, id) {
+    try {
+      const storyUrl = `${this.getAliasDomain(alias)}/stories/${id}`;
+      await this.got.get(storyUrl);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  async createStory(alias, story) {
+    try {
+      this.#validateStory(story);
+
+      const storyCreateUrl = `${this.getAliasDomain(alias)}/stories/create`;
+      let response = await this.got.get(storyCreateUrl);
+
+      await this.delayNextPromise();
+
+      const form = {
+        secretKey: this.#getSecretKey(response.body),
+        content_title: story.title,
+        modNiceUrls_urlid: story.niceurl,
+        content_text: story.body || '',
+        addToFront: '1',
+        checkbox_addToFront: 'addToFront',
+        addToTopic: '',
+        topic: story.topic || '',
+        editableby: '0',
+        discussions: '1',
+        checkbox_discussions: 'discussions',
+        createtime: story.publish || ''
+      };
+      form[story.action] = true; // save || publish
+
+      response = await this.got.post(storyCreateUrl, { form });
+
+      if (!this.silent)
+        console.log(`Story "${alias}/${story.niceurl}" successfully created (statusCode=${response.statusCode}).`);
+      return response;
+    } catch (err) {
+      console.log(chalk.red(`Error while creating story "${alias}/${story.niceurl}" --> ${err}`));
+    }
+  }
+
+  #getStoryParams(data) {
+    let $ = cheerio.load(data);
+    return {
+      secretKey: $('[name="secretKey"]').val(),
+      content_title: $('[name="content_title"]').val(),
+      modNiceUrls_urlid: $('[name="modNiceUrls_urlid"]').val(),
+      content_text: $('[name="content_text"]').val(),
+      addToFront: $('[name="addToFront"]').val(),
+      addToTopic: $('[name="addToTopic"]').val(),
+      editableby: $('[name="editableby"]').val(),
+      discussions: $('[name="discussions"]').val(),
+      createtime: $('[name="createtime"]').val()
+    };
+  }
+
+  async updateStory(alias, story) {
+    try {
+      this.#validateStory(story);
+
+      const storyID = story.id || story.niceurl;
+      const storyEditUrl = `${this.getAliasDomain(alias)}/stories/${storyID}/edit`;
+      let response = await this.got.get(storyEditUrl);
+      const params = this.#getStoryParams(response.body);
+
+      await this.delayNextPromise();
+
+      const form = {
+        secretKey: params.secretKey,
+        content_title: story.title || params.content_title,
+        modNiceUrls_urlid: story.niceurl || params.niceurl,
+        content_text: story.body || params.content_text,
+        addToFront: params.addToFront,
+        checkbox_addToFront: 'addToFront',
+        addToTopic: params.addToTopic,
+        topic: story.topic || '',
+        editableby: params.editableby,
+        discussions: params.discussions,
+        checkbox_discussions: 'discussions',
+        createtime: story.publish || params.createtime
+      };
+      form[story.action] = true; // save || publish
+
+      response = await this.got.post(storyEditUrl, { form });
+
+      if (!this.silent)
+        console.log(`Story "${alias}/${storyID}" successfully updated (statusCode=${response.statusCode}).`);
+      return response;
+    } catch (err) {
+      console.log(chalk.red(`Error while updating story "${alias}/${storyID}" --> ${err}`));
     }
   }
 
