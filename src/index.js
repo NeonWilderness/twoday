@@ -589,6 +589,23 @@ class Twoday {
     }
   }
 
+  async getStoryTopics(alias) {
+    try {
+      const storyTopicsUrl = `${this.getAliasDomain(alias)}/topics`;
+      const response = await this.got.get(storyTopicsUrl);
+
+      const $ = cheerio.load(response.body);
+      return $('.listItem td>a')
+        .map((i, el) => {
+          let $el = $(el);
+          return { name: $el.text(), url: $el.attr('href') };
+        })
+        .get();
+    } catch (err) {
+      console.log(chalk.red(`Error while reading story topics of "${alias}" --> ${err}`));
+    }
+  }
+
   async downloadLayout(alias, layout) {
     try {
       this.checkLoggedIn();

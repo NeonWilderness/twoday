@@ -14,7 +14,7 @@ interface tIsModifiedSkin extends tIsValidHoptype {
   isModified: boolean;
   url: string;
 }
-interface tModifiedSkin {
+interface tNameUrl {
   name: string;
   url: string;
 }
@@ -73,7 +73,7 @@ declare class Twoday {
   isValidHoptype(skinName: string): Promise<tIsValidHoptype>;
   getMemberships(): Promise<string[]>;
   // skins
-  getModifiedSkins(alias: string): Promise<tModifiedSkin>;
+  getModifiedSkins(alias: string): Promise<tNameUrl[]>;
   isModifiedSkin(alias: string, skinName: string): Promise<tIsModifiedSkin>;
   getLayoutUrl(alias: string): Promise<string>;
   getSkin(skin: tSkin): Promise<tSkinEnriched>;
@@ -92,6 +92,7 @@ declare class Twoday {
   hasStory(alias: string, id: string): Promise<boolean>;
   createStory(alias: string, story: tStoryInfo): Promise<Response>;
   updateStory(alias: string, story: tStoryInfo): Promise<Response>;
+  getStoryTopics(alias: string): Promise<tNameUrl[]>;
   // layout
   downloadLayout(alias: string, layout: tLayoutInfo): Promise<Response>;
   // special
