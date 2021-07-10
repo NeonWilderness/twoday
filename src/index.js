@@ -4,6 +4,7 @@
 const assert = require('assert').strict;
 const chalk = require('chalk');
 const cheerio = require('cheerio');
+const diff = require('diff');
 const FormData = require('form-data');
 const fs = require('fs');
 const got = require('got');
@@ -265,10 +266,31 @@ class Twoday {
     }
   }
 
+  /**
+   * Diffs 2 strings and displays the variations: red=deleted, green=added, gray=unchanged
+   * @param {String} h header: title | description | skin
+   * @param {String} s1 old value
+   * @param {String} s2 new value
+   * @param {String} position skin name and blog alias
+   * @returns {void}
+   */
+  logDiff(h, s1, s2, position) {
+    const embed = `${h} diff of ${position}`;
+    console.log(`\n${embed}, was length=${s1.length}, now=${s2.length} -->`);
+
+    const differ = diff.diffChars(s1, s2);
+    differ.forEach(part => {
+      const color = part.added ? 'green' : part.removed ? 'red' : 'grey';
+      process.stderr.write(chalk[color](part.value));
+    });
+
+    console.log(`\n<-- ${embed}\n`);
+  }
+
   #validateOptions(options) {
     assert.ok(typeof options === 'object', 'Options must be an object!');
     assert.ok(
-      Object.keys(options).filter(key => !['title', 'description', 'skin'].includes(key)).length === 0,
+      Object.keys(options).filter(key => !['title', 'description', 'skin', 'diff'].includes(key)).length === 0,
       'Invalid option key!'
     );
   }
@@ -280,14 +302,33 @@ class Twoday {
       const { isModified, url } = await this.isModifiedSkin(alias, skinName);
       if (!isModified) return createSkin(alias, skinName, options);
 
-      const data = await this.getSkin({
+      const oldSkin = await this.getSkin({
         name: skinName,
         url
       });
 
       await this.delayNextPromise();
 
-      let response = await this.postSkin(Object.assign(data, options));
+      if (options.diff) {
+        delete options.diff;
+        const position = `${skinName} (${alias})`;
+
+        let hasChanged = false;
+        for (let option of Object.entries(options)) {
+          let [field, newValue] = option;
+          if (oldSkin[field] != newValue) {
+            this.logDiff(field, oldSkin[field], newValue, position);
+            hasChanged = true;
+          }
+        }
+
+        if (!hasChanged) {
+          console.log(chalk.gray(`Skipping update of skin ${skin.name} (unchanged).`));
+          return;
+        }
+      }
+
+      let response = await this.postSkin(Object.assign(oldSkin, options));
       if (!this.silent)
         console.log(`Skin "${alias}/${skinName}" successfully updated (statusCode=${response.statusCode}).`);
       return response;
@@ -340,6 +381,7 @@ class Twoday {
 
       await this.delayNextPromise();
 
+      delete options.diff;
       const defaults = {
         title: `${skinName}`,
         description: `${skinName}`,

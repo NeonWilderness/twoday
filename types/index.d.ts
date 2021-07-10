@@ -37,6 +37,7 @@ interface tSkinOptions {
   title?: string;
   description?: string;
   skin?: string;
+  diff?: boolean;
 }
 interface tFileInfo {
   name: string;

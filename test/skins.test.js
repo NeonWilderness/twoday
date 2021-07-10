@@ -6,11 +6,11 @@ const td = new Twoday('dev', { silent: true });
 const alias = 'neonwilderness';
 
 describe('Can work with Twoday skins', () => {
-  it('should throw when login is missing', () => {
+  it.skip('should throw when login is missing', () => {
     return expect(() => td.getModifiedSkins(alias)).rejects.toThrow();
   });
 
-  it('should return a modified skins array', () => {
+  it.skip('should return a modified skins array', () => {
     return td
       .login()
       .then(() => td.getModifiedSkins(alias))
@@ -24,7 +24,7 @@ describe('Can work with Twoday skins', () => {
       });
   });
 
-  it('should detect a modified skin', () => {
+  it.skip('should detect a modified skin', () => {
     return td
       .login()
       .then(() => td.isModifiedSkin(alias, 'Site.page'))
@@ -37,7 +37,7 @@ describe('Can work with Twoday skins', () => {
       });
   });
 
-  it('should detect an unmodified skin', () => {
+  it.skip('should detect an unmodified skin', () => {
     return td
       .login()
       .then(() => td.isModifiedSkin(alias, 'Story.notModified'))
@@ -50,7 +50,7 @@ describe('Can work with Twoday skins', () => {
       });
   });
 
-  it('should detect a valid hoptype', () => {
+  it.skip('should detect a valid hoptype', () => {
     return td.isValidHoptype('site.something')
       .then(result => {
         expect(typeof result).toBe('object');
@@ -60,7 +60,7 @@ describe('Can work with Twoday skins', () => {
       });
   });
 
-  it('should understand an uppercase hoptype', () => {
+  it.skip('should understand an uppercase hoptype', () => {
     return td.isValidHoptype('StOrY.display')
       .then(result => {
         expect(typeof result).toBe('object');
@@ -70,7 +70,7 @@ describe('Can work with Twoday skins', () => {
       });
   });
 
-  it('should detect an invalid hoptype', () => {
+  it.skip('should detect an invalid hoptype', () => {
     return td.isValidHoptype('xxx.wrongHopType')
       .then(result => {
         expect(typeof result).toBe('object');
@@ -80,7 +80,7 @@ describe('Can work with Twoday skins', () => {
       });
   });
 
-  it('should return skin data via GET', () => {
+  it.skip('should return skin data via GET', () => {
     return td.login()
       .then(() => td.getModifiedSkins('neonwilderness'))
       .then(skins => td.getSkin(skins[skins.length - 1]))
@@ -100,7 +100,7 @@ describe('Can work with Twoday skins', () => {
       });
   });
 
-  it('should create and delete a new skin', () => {
+  it.skip('should create and delete a new skin', () => {
     const rnd = Math.floor(Math.random() * 20);
     const skin = `Site.something${rnd.toString().padStart(2,'0')}`;
     return td.login()
@@ -118,5 +118,15 @@ describe('Can work with Twoday skins', () => {
       })
       .then(() => td.isModifiedSkin(alias, skin))
       .then(result => expect(result.isModified).toBeFalsy())
+  });
+
+  it('should update and log diff an existing skin', () => {
+    const skinName = 'Site.something08';
+    return td.login()
+      .then(() => td.updateSkin(alias, skinName, {
+        description: 'This is an updated test skin used by the twoday npm module.',
+        skin: '<div>An updated version is here.</div>',
+        diff: true
+      }))
   });
 });
