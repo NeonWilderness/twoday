@@ -268,23 +268,53 @@ class Twoday {
 
   /**
    * Diffs 2 strings and displays the variations: red=deleted, green=added, gray=unchanged
-   * @param {String} h header: title | description | skin
+   * @param {String} h header: e.g. title | description | skin
    * @param {String} s1 old value
    * @param {String} s2 new value
-   * @param {String} position skin name and blog alias
+   * @param {String} item e.g. skin name and alias
    * @returns {void}
    */
-  logDiff(h, s1, s2, position) {
-    const embed = `${h} diff of ${position}`;
-    console.log(`\n${embed}, was length=${s1.length}, now=${s2.length} -->`);
-
+  logDiff(h, s1, s2, item) {
+    const embed = `[${h}] of ${chalk.italic(item)}`;
     const differ = diff.diffChars(s1, s2);
-    differ.forEach(part => {
-      const color = part.added ? 'green' : part.removed ? 'red' : 'grey';
-      process.stderr.write(chalk[color](part.value));
-    });
+    const hasChanged = differ.reduce((changes, part) => {
+      if (part.added || part.removed) changes = true;
+      return changes;
+    }, false);
 
-    console.log(`\n<-- ${embed}\n`);
+    if (hasChanged) {
+      process.stdout.write(
+        chalk.cyan(
+          `${embed}, was length=${s1.length}, ${
+            s1.length === s2.length ? 'now same' : 'now=' + chalk.white(s2.length)
+          }: `
+        )
+      );
+      differ.forEach(part => {
+        const color = part.added ? 'green' : part.removed ? 'red' : 'grey';
+        process.stdout.write(chalk[color](part.value));
+      });
+      process.stdout.write('\n');
+    } else {
+      console.log(chalk.grey(`${embed} is unchanged.`));
+    }
+    return hasChanged;
+  }
+
+  diffSkin(skinName, skin1, skin2) {
+    try {
+      this.#validateOptions(skin1);
+      delete skin1.diff;
+      let skinChanged = false,
+        fieldChange;
+      for (let field of Object.keys(skin1)) {
+        fieldChange = this.logDiff(field, skin1[field], skin2[field] || '', skinName);
+        skinChanged = skinChanged || fieldChange;
+      }
+      return skinChanged;
+    } catch (err) {
+      throw err;
+    }
   }
 
   #validateOptions(options) {
@@ -311,19 +341,19 @@ class Twoday {
 
       if (options.diff) {
         delete options.diff;
-        const position = `${skinName} (${alias})`;
+        const item = `${skinName} (${alias})`;
 
         let hasChanged = false;
         for (let option of Object.entries(options)) {
           let [field, newValue] = option;
           if (oldSkin[field] != newValue) {
-            this.logDiff(field, oldSkin[field], newValue, position);
+            this.logDiff(field, oldSkin[field], newValue, item);
             hasChanged = true;
           }
         }
 
         if (!hasChanged) {
-          console.log(chalk.gray(`Skipping update of skin ${skin.name} (unchanged).`));
+          if (!this.silent) console.log(chalk.gray(`Skipping update of skin ${skin.name} (unchanged).`));
           return;
         }
       }
