@@ -305,6 +305,7 @@ class Twoday {
     try {
       this.#validateOptions(skin1);
       delete skin1.diff;
+      delete skin1.name;
       let skinChanged = false,
         fieldChange;
       for (let field of Object.keys(skin1)) {
@@ -320,7 +321,7 @@ class Twoday {
   #validateOptions(options) {
     assert.ok(typeof options === 'object', 'Options must be an object!');
     assert.ok(
-      Object.keys(options).filter(key => !['title', 'description', 'skin', 'diff'].includes(key)).length === 0,
+      Object.keys(options).filter(key => !['name', 'title', 'description', 'skin', 'diff'].includes(key)).length === 0,
       'Invalid option key!'
     );
   }
