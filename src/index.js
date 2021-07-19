@@ -4,12 +4,18 @@
 const assert = require('assert').strict;
 const chalk = require('chalk');
 const cheerio = require('cheerio');
-const diff = require('diff');
+const { convertChangesToXML, diffLines } = require('diff');
 const FormData = require('form-data');
 const fs = require('fs');
 const got = require('got');
 const pkg = require('../package.json');
 const tough = require('tough-cookie');
+
+const diffPrefix = {
+  red: '- ',
+  green: '+ ',
+  grey: '  '
+}
 
 class Twoday {
   constructor(platform, userOptions = {}) {
@@ -267,38 +273,35 @@ class Twoday {
   }
 
   /**
-   * Diffs 2 strings and displays the variations: red=deleted, green=added, gray=unchanged
+   * Diffs 2 strings per line and displays the variations: red=deleted, green=added, grey=unchanged
    * @param {String} h header: e.g. title | description | skin
    * @param {String} s1 old value
    * @param {String} s2 new value
    * @param {String} item e.g. skin name and alias
-   * @returns {void}
+   * @returns {tDiffResult}
    */
-  logDiff(h, s1, s2, item) {
-    const embed = `[${h}] of ${chalk.italic(item)}`;
-    const differ = diff.diffChars(s1, s2);
-    const hasChanged = differ.reduce((changes, part) => {
-      if (part.added || part.removed) changes = true;
-      return changes;
-    }, false);
+  evalDiff(h, s1, s2, item) {
+    const header = `[${h}] of ${item}`;
+    const differ = diffLines(s1, s2);
+    const itemChanged = differ.filter(part => part.added || part.removed).length;
+    let text;
 
-    if (hasChanged) {
-      process.stdout.write(
-        chalk.cyan(
-          `${embed}, was length=${s1.length}, ${
-            s1.length === s2.length ? 'now same' : 'now=' + chalk.white(s2.length)
-          }: `
-        )
-      );
+    if (itemChanged) {
+      text = `${header}, was length=${s1.length}, ${s1.length === s2.length ? 'now same' : 'now=' + s2.length}:`;
+      process.stdout.write(chalk.cyan(text));
+      process.stdout.write('\n');
       differ.forEach(part => {
         const color = part.added ? 'green' : part.removed ? 'red' : 'grey';
+        process.stdout.write(chalk[color](diffPrefix[color]));
         process.stdout.write(chalk[color](part.value));
+        process.stdout.write('\n');
       });
-      process.stdout.write('\n');
     } else {
-      console.log(chalk.grey(`${embed} is unchanged.`));
+      text = `${header} is unchanged.`;
+      process.stdout.write(chalk.grey(text));
+      process.stdout.write('\n');
     }
-    return hasChanged;
+    return { itemChanged, header, text, diffs: convertChangesToXML(differ) };
   }
 
   diffSkin(skinName, skin1, skin2) {
@@ -306,13 +309,14 @@ class Twoday {
       this.#validateOptions(skin1);
       delete skin1.diff;
       delete skin1.name;
-      let skinChanged = false,
-        fieldChange;
+      let diffResults = [];
       for (let field of Object.keys(skin1)) {
-        fieldChange = this.logDiff(field, skin1[field], skin2[field] || '', skinName);
-        skinChanged = skinChanged || fieldChange;
+        diffResults.push(this.evalDiff(field, skin1[field], skin2[field] || '', skinName));
       }
-      return skinChanged;
+      return {
+        skinChanged: !!diffResults.filter(result => result.itemChanged).length,
+        results: diffResults
+      }
     } catch (err) {
       throw err;
     }

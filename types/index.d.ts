@@ -39,6 +39,16 @@ interface tSkinOptions {
   skin?: string;
   diff?: boolean;
 }
+interface tDiffResult {
+  itemChanged: boolean;
+  header: string;
+  text: string;
+  diffs: string;
+}
+interface tDiffResults {
+  skinChanged: boolean;
+  results: tDiffResult[];
+}
 interface tFileInfo {
   name: string;
   path: string;
@@ -79,8 +89,8 @@ declare class Twoday {
   getLayoutUrl(alias: string): Promise<string>;
   getSkin(skin: tSkin): Promise<tSkinEnriched>;
   postSkin(skin: tSkinEnriched): Promise<Response>;
-  logDiff(h: string, s1: string, s2: string, item: string): boolean;
-  diffSkin(skinName: string, skin1: tSkinOptions, skin2: tSkinOptions): boolean;
+  evalDiff(h: string, s1: string, s2: string, item: string, logToConsole: boolean): tDiffResult;
+  diffSkin(skinName: string, skin1: tSkinOptions, skin2: tSkinOptions, logToConsole: boolean): tDiffResults;
   #validateOptions(options: tSkinOptions): void;
   updateSkin(alias: string, skinName: string, options: tSkinOptions): Promise<Response>;
   deleteSkin(alias: string, skinName: string): Promise<Response>;
