@@ -314,6 +314,7 @@ class Twoday {
         diffResults.push(this.evalDiff(field, skin1[field], skin2[field] || '', skinName));
       }
       return {
+        skinName,
         skinChanged: !!diffResults.filter(result => result.itemChanged).length,
         results: diffResults
       }
