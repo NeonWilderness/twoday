@@ -301,7 +301,7 @@ class Twoday {
       process.stdout.write(chalk.grey(text));
       process.stdout.write('\n');
     }
-    return { itemChanged, header, text, diffs: convertChangesToXML(differ) };
+    return { itemChanged, text, diffs: convertChangesToXML(differ) };
   }
 
   diffSkin(skinName, skin1, skin2) {
