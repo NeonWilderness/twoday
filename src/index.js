@@ -277,17 +277,16 @@ class Twoday {
    * @param {String} h header: e.g. title | description | skin
    * @param {String} s1 old value
    * @param {String} s2 new value
-   * @param {String} item e.g. skin name and alias
    * @returns {tDiffResult}
    */
-  evalDiff(h, s1, s2, item) {
-    const header = `[${h}] of ${item}`;
+  evalDiff(h, s1, s2) {
+    const header = `[${h}]`;
     const differ = diffLines(s1, s2);
     const itemChanged = differ.filter(part => part.added || part.removed).length;
     let text;
 
     if (itemChanged) {
-      text = `${header}, was length=${s1.length}, ${s1.length === s2.length ? 'now same' : 'now=' + s2.length}:`;
+      text = `${header} was length=${s1.length}, ${s1.length === s2.length ? 'now same' : 'now=' + s2.length}:`;
       process.stdout.write(chalk.cyan(text));
       process.stdout.write('\n');
       differ.forEach(part => {
@@ -311,7 +310,7 @@ class Twoday {
       delete skin1.name;
       let diffResults = [];
       for (let field of Object.keys(skin1)) {
-        diffResults.push(this.evalDiff(field, skin1[field], skin2[field] || '', skinName));
+        diffResults.push(this.evalDiff(field, skin1[field], skin2[field] || ''));
       }
       return {
         skinName,

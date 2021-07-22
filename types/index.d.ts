@@ -89,7 +89,7 @@ declare class Twoday {
   getLayoutUrl(alias: string): Promise<string>;
   getSkin(skin: tSkin): Promise<tSkinEnriched>;
   postSkin(skin: tSkinEnriched): Promise<Response>;
-  evalDiff(h: string, s1: string, s2: string, item: string): tDiffResult;
+  evalDiff(h: string, s1: string, s2: string): tDiffResult;
   diffSkin(skinName: string, skin1: tSkinOptions, skin2: tSkinOptions): tDiffResults;
   #validateOptions(options: tSkinOptions): void;
   updateSkin(alias: string, skinName: string, options: tSkinOptions): Promise<Response>;
