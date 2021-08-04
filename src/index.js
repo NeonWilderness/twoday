@@ -32,6 +32,7 @@ class Twoday {
     this.layoutUrl = {};
     this.delay = Math.abs(options.delay); // ms
     this.silent = options.silent; // true=no console messages
+    this.version = pkg.version;
 
     const cookie = tough.Cookie;
     const agreed = cookie.parse(
@@ -45,7 +46,7 @@ class Twoday {
       methodRewriting: false,
       prefixUrl: ''
     });
-    if (!this.silent) console.log(`Twoday v${pkg.version} on ${this.platform}.`);
+    if (!this.silent) console.log(`Twoday v${this.version} on ${this.platform}.`);
   }
 
   checkLoggedIn() {
@@ -346,13 +347,12 @@ class Twoday {
 
       if (options.diff) {
         delete options.diff;
-        const item = `${skinName} (${alias})`;
 
         let hasChanged = false;
         for (let option of Object.entries(options)) {
           let [field, newValue] = option;
           if (oldSkin[field] != newValue) {
-            this.logDiff(field, oldSkin[field], newValue, item);
+            this.evalDiff(field, oldSkin[field], newValue);
             hasChanged = true;
           }
         }
@@ -379,9 +379,9 @@ class Twoday {
       const { isModified, prototype, name } = await this.isModifiedSkin(alias, skinName);
       if (!isModified) throw new Error('Skin is not a modified/deletable skin!');
 
-      await this.getLayoutUrl(alias);
+      const layoutUrl = await this.getLayoutUrl(alias);
 
-      const deleteUrl = `${this.layoutUrl}/skins/${prototype}/${name}/delete`;
+      const deleteUrl = `${layoutUrl}/skins/${prototype}/${name}/delete`;
       let response = await this.got.get(deleteUrl);
 
       await this.delayNextPromise();
@@ -695,7 +695,7 @@ class Twoday {
       response = await this.got.post(downloadUrl, {
         form: {
           secretKey: this.#getSecretKey(response.body),
-          changesonly: 'Nur Änderungen'
+          changesonly: true
         }
       });
 

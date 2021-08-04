@@ -7,7 +7,7 @@ const td = new Twoday('prod');
 const alias = 'foundation';
 
 describe('Can work with Twoday stories', () => {
-  it.skip('should create a new story as unpublished', async () => {
+  it('should create a new story as unpublished', async () => {
     const rnd = Math.floor(Math.random() * 99);
     const story = {
       title: `Title No.${rnd.toString().padStart(2, '0')}`,
@@ -17,7 +17,7 @@ describe('Can work with Twoday stories', () => {
     return await td.createStory(alias, story);
   });
 
-  it.skip('should update/publish a story by id', async () => {
+  it('should update/publish a story by id', async () => {
     const story = {
       title: `Title No.11`,
       id: 1022684884,
@@ -28,7 +28,7 @@ describe('Can work with Twoday stories', () => {
     return await td.updateStory(alias, story);
   });
 
-  it.skip('should unpublish a published story', async () => {
+  it('should unpublish a published story', async () => {
     const story = {
       title: `Title No.11`,
       id: 1022684884,
@@ -38,7 +38,7 @@ describe('Can work with Twoday stories', () => {
     return await td.updateStory(alias, story);
   });
 
-  it.skip('should check if a story exists', async () => {
+  it('should check if a story exists', async () => {
     await td.login();
     let result = await td.hasStory(alias, 'faktortable');
     expect(result).toBeTruthy();
