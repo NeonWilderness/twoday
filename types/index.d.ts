@@ -58,6 +58,11 @@ interface tLayoutInfo {
   name: string;
   path: string;
 }
+interface tLayoutData {
+  activeLayoutUrl: string;
+  activeLayoutName: string;
+  layoutNames: string[];
+}
 type tStoryID = string | number;
 type tStoryAction = 'save' | 'publish';
 interface tStoryInfo {
@@ -86,7 +91,12 @@ declare class Twoday {
   // skins
   getModifiedSkins(alias: string): Promise<tNameUrl[]>;
   isModifiedSkin(alias: string, skinName: string): Promise<tIsModifiedSkin>;
-  getLayoutUrl(alias: string): Promise<string>;
+  #getLayoutData(alias: string): Promise<tLayoutData>;
+  getLayout(alias: string, refresh?: boolean): Promise<tLayoutData>;
+  getActiveLayoutUrl(alias: string): Promise<string>;
+  getActiveLayoutName(alias: string): Promise<string>;
+  getLayoutNames(alias: string): Promise<string[]>;
+  useLayout(alias: string, layoutName: string): Promise<tLayoutData>;
   getSkin(skin: tSkin): Promise<tSkinEnriched>;
   postSkin(skin: tSkinEnriched): Promise<Response>;
   evalDiff(h: string, s1: string, s2: string): tDiffResult;

@@ -15,21 +15,21 @@ const diffPrefix = {
   red: '- ',
   green: '+ ',
   grey: '  '
-}
+};
 
 class Twoday {
   constructor(platform, userOptions = {}) {
     const defaults = { delay: 20, agreedVersion: '20190210a', silent: false };
     const options = Object.assign({}, defaults, userOptions);
-    assert.ok(typeof platform === 'string', 'Param "platform" must be a string!');
-    assert.ok(typeof options.agreedVersion === 'string', 'User option "agreedVersion" must be a string!');
-    assert.ok(typeof options.delay === 'number', 'User option "delay" must be a number!');
-    assert.ok(typeof options.silent === 'boolean', 'User option "silent" must be a boolean!');
+    assert.ok(typeof platform === 'string', new Error('Param "platform" must be a string!'));
+    assert.ok(typeof options.agreedVersion === 'string', new Error('User option "agreedVersion" must be a string!'));
+    assert.ok(typeof options.delay === 'number', new Error('User option "delay" must be a number!'));
+    assert.ok(typeof options.silent === 'boolean', new Error('User option "silent" must be a boolean!'));
 
     this.platform = platform.toLowerCase(); // dev | prod
     this.fullDomain = `twoday.${this.#getDomain()}`;
     this.baseUrl = `https://${this.fullDomain}`;
-    this.layoutUrl = {};
+    this.layout = {};
     this.delay = Math.abs(options.delay); // ms
     this.silent = options.silent; // true=no console messages
     this.version = pkg.version;
@@ -211,25 +211,72 @@ class Twoday {
       result.url = result.isModified ? filtered[0].url : '';
       return result;
     } catch (err) {
-      console.log(chalk.red(`isModifiedSkin "${alias}/${skinName}" failed --> ${err}`));
+      throw new Error(`isModifiedSkin "${alias}/${skinName}" failed --> ${err}`);
     }
   }
 
-  async getLayoutUrl(alias) {
-    if (this.layoutUrl[alias]) return this.layoutUrl[alias];
+  async #getLayoutData(alias) {
+    this.checkLoggedIn();
+
+    const response = await this.got.get('layouts/main', {
+      prefixUrl: `${this.getAliasDomain(alias)}`
+    });
+
+    const $ = cheerio.load(response.body);
+    const layoutLinks = $('a[href*="download"]');
+    const url = $('.level2 a.active').eq(0).attr('href');
+    const activeLayoutUrl = this.fixURL(url.split('/').slice(0, -1).join('/'));
+
+    this.layout[alias] = {
+      activeLayoutUrl,
+      activeLayoutName: activeLayoutUrl.split('/').pop(),
+      layoutNames: Array.from(layoutLinks).map(a => a.attribs.href.match(/layouts\/(\w*)\//)[1])
+    };
+    return this.layout[alias];
+  }
+
+  async getLayout(alias, refresh = false) {
+    if (this.layout[alias] && !refresh) return this.layout[alias];
     try {
-      this.checkLoggedIn();
-
-      const response = await this.got.get('layouts/main', {
-        prefixUrl: `${this.getAliasDomain(alias)}`
-      });
-
-      const $ = cheerio.load(response.body);
-      const url = $('.level2 a.active').eq(0).attr('href');
-      this.layoutUrl[alias] = this.fixURL(url.split('/').slice(0, -1).join('/'));
-      return this.layoutUrl[alias];
+      return await this.#getLayoutData(alias);
     } catch (err) {
-      console.log(chalk.red(`getLayoutUrl from "${alias}" failed --> ${err}`));
+      throw new Error(`getActiveLayoutUrl from "${alias}" failed --> ${err}`);
+    }
+  }
+
+  async getActiveLayoutUrl(alias) {
+    const { activeLayoutUrl } = await this.getLayout(alias);
+    return activeLayoutUrl;
+  }
+
+  async getActiveLayoutName(alias) {
+    const { activeLayoutName } = await this.getLayout(alias);
+    return activeLayoutName;
+  }
+
+  async getLayoutNames(alias) {
+    const { layoutNames } = await this.getLayout(alias);
+    return layoutNames;
+  }
+
+  async useLayout(alias, layoutName = '') {
+    try {
+      assert.ok(typeof layoutName === 'string' && layoutName.length, new Error('Missing layout name!'));
+      layoutName = layoutName.toLowerCase();
+
+      const layout = await this.getLayout(alias);
+      assert.ok(layout.layoutNames.includes(layoutName), new Error(`Layout "${alias}/${layoutName}" does not exist!`));
+
+      if (layout.activeLayoutName !== layoutName) {
+        let parts = layout.activeLayoutUrl.split('/');
+        parts.splice(-1, 1, layoutName);
+        layout.activeLayoutUrl = parts.join('/');
+        layout.activeLayoutName = layoutName;
+      }
+
+      return layout;
+    } catch (err) {
+      throw new Error(`useLayout "${alias}/${layoutName || '?'}" failed --> ${err}`);
     }
   }
 
@@ -253,7 +300,7 @@ class Twoday {
         save: $('[name="save"]').val()
       });
     } catch (err) {
-      console.log(chalk.red(`getSkin "${skin.name}" failed --> ${err}`));
+      throw new Error(`getSkin "${skin.name}" failed --> ${err}`);
     }
   }
 
@@ -269,7 +316,7 @@ class Twoday {
         form: data
       });
     } catch (err) {
-      console.log(chalk.red(`postSkin "${skin.name}" failed --> ${err}`));
+      throw new Error(`postSkin "${skin.name}" failed --> ${err}`);
     }
   }
 
@@ -317,17 +364,17 @@ class Twoday {
         skinName,
         skinChanged: !!diffResults.filter(result => result.itemChanged).length,
         results: diffResults
-      }
+      };
     } catch (err) {
       throw err;
     }
   }
 
   #validateOptions(options) {
-    assert.ok(typeof options === 'object', 'Options must be an object!');
+    assert.ok(typeof options === 'object', new Error('Options must be an object!'));
     assert.ok(
       Object.keys(options).filter(key => !['name', 'title', 'description', 'skin', 'diff'].includes(key)).length === 0,
-      'Invalid option key!'
+      new Error('Invalid option key!')
     );
   }
 
@@ -368,7 +415,7 @@ class Twoday {
         console.log(`Skin "${alias}/${skinName}" successfully updated (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      console.log(chalk.red(`Error while creating new skin "${alias}/${skinName}" --> ${err}`));
+      console.log(chalk.red(`Error while updating skin "${alias}/${skinName}" --> ${err}`));
     }
   }
 
@@ -379,7 +426,7 @@ class Twoday {
       const { isModified, prototype, name } = await this.isModifiedSkin(alias, skinName);
       if (!isModified) throw new Error('Skin is not a modified/deletable skin!');
 
-      const layoutUrl = await this.getLayoutUrl(alias);
+      const layoutUrl = await this.getActiveLayoutUrl(alias);
 
       const deleteUrl = `${layoutUrl}/skins/${prototype}/${name}/delete`;
       let response = await this.got.get(deleteUrl);
@@ -407,7 +454,7 @@ class Twoday {
       const { valid } = await this.isValidHoptype(skinName);
       if (!valid) throw new Error(`New skin does not have a valid Hoptype!`);
 
-      const layoutUrl = await this.getLayoutUrl(alias);
+      const layoutUrl = await this.getActiveLayoutUrl(alias);
 
       const data = await this.getSkin({
         name: skinName,
@@ -556,17 +603,16 @@ class Twoday {
   }
 
   #validateStory(story) {
-    assert.ok(typeof story === 'object', 'Story param must be an object!');
+    assert.ok(typeof story === 'object', new Error('Story param must be an object!'));
     assert.ok(
       Object.keys(story).filter(key => !['title', 'niceurl', 'body', 'id', 'topic', 'publish', 'action'].includes(key))
-        .length === 0,
-      'Invalid story param key!'
-    );
-    assert.ok(story.title, 'Story title must not be empty!');
+        .length === 0, new Error('Invalid story param key!'));
+    assert.ok(story.title, new Error('Story title must not be empty!'));
     story.niceurl = this.getNiceUrl(story.niceurl ? story.niceurl : story.title);
 
-    if (story.action) assert.ok(['save', 'publish'].includes(story.action));
-    else story.action = 'save';
+    if (!story.action) story.action = 'save';
+    else if (!['save', 'publish'].includes(story.action))
+      throw new Error('Story action param must be "save" or "publish".');
   }
 
   async hasStory(alias, id) {
