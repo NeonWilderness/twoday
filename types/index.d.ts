@@ -75,6 +75,17 @@ interface tStoryInfo {
   action?: tStoryAction;
 }
 type tAlienVersion = string | 'N/A';
+interface tAliasInfo {
+  creator: string,
+  createDate: string,
+  stories: number,
+  comments: number,
+  images: number,
+  files: number,
+  diskUsage: string,
+  usedKB: number,
+  trustedSite: boolean
+}
 
 declare class Twoday {
   constructor(platform: tPlatform, userOptions?: tUserOptions);
@@ -85,18 +96,13 @@ declare class Twoday {
   #getSecretKey(data: string): string;
   fixURL(url: string): string;
   login(): Promise<Response>;
+  logout(): Promise<Response>;
   getValidHoptypes(): Promise<string[]>;
   isValidHoptype(skinName: string): Promise<tIsValidHoptype>;
   getMemberships(): Promise<string[]>;
   // skins
   getModifiedSkins(alias: string): Promise<tNameUrl[]>;
   isModifiedSkin(alias: string, skinName: string): Promise<tIsModifiedSkin>;
-  #getLayoutData(alias: string): Promise<tLayoutData>;
-  getLayout(alias: string, refresh?: boolean): Promise<tLayoutData>;
-  getActiveLayoutUrl(alias: string): Promise<string>;
-  getActiveLayoutName(alias: string): Promise<string>;
-  getLayoutNames(alias: string): Promise<string[]>;
-  useLayout(alias: string, layoutName: string): Promise<tLayoutData>;
   getSkin(skin: tSkin): Promise<tSkinEnriched>;
   postSkin(skin: tSkinEnriched): Promise<Response>;
   evalDiff(h: string, s1: string, s2: string): tDiffResult;
@@ -117,7 +123,14 @@ declare class Twoday {
   updateStory(alias: string, story: tStoryInfo): Promise<Response>;
   getStoryTopics(alias: string): Promise<tNameUrl[]>;
   // layout
+  #getLayoutData(alias: string): Promise<tLayoutData>;
+  getLayout(alias: string, refresh?: boolean): Promise<tLayoutData>;
+  getActiveLayoutUrl(alias: string): Promise<string>;
+  getActiveLayoutName(alias: string): Promise<string>;
+  getLayoutNames(alias: string): Promise<string[]>;
+  useLayout(alias: string, layoutName: string): Promise<tLayoutData>;
   downloadLayout(alias: string, layout: tLayoutInfo): Promise<Response>;
   // special
   checkUserAlienVersion(alias: string): Promise<tAlienVersion>;
+  getInfo(alias: string): Promise<tAliasInfo>;
 }

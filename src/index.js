@@ -115,6 +115,17 @@ class Twoday {
     }
   }
 
+  async logout() {
+    try {
+      const response = await this.got.get(`${this.baseUrl}/members/logout`);
+
+      if (!this.silent) console.log(`Logout of ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
+      return response;
+    } catch (err) {
+      console.log(chalk.red(`${this.fullDomain} logout failed --> ${err}`));
+    }
+  }
+
   async getValidHoptypes() {
     if (this.validHoptypes) return this.validHoptypes;
     try {
@@ -606,7 +617,9 @@ class Twoday {
     assert.ok(typeof story === 'object', new Error('Story param must be an object!'));
     assert.ok(
       Object.keys(story).filter(key => !['title', 'niceurl', 'body', 'id', 'topic', 'publish', 'action'].includes(key))
-        .length === 0, new Error('Invalid story param key!'));
+        .length === 0,
+      new Error('Invalid story param key!')
+    );
     assert.ok(story.title, new Error('Story title must not be empty!'));
     story.niceurl = this.getNiceUrl(story.niceurl ? story.niceurl : story.title);
 
@@ -764,6 +777,46 @@ class Twoday {
       return el.attribs['data-version'] || 'N/A';
     } catch (err) {
       console.log(chalk.red(`Error while checking alien version of "${alias}" --> ${err}`));
+    }
+  }
+
+  async getInfo(alias) {
+    const filter = {
+      de: { m: /erstellt von (.*)/, s: ' am ' },
+      en: { m: /created by (.*)/, s: ' on ' }
+    };
+    try {
+      this.checkLoggedIn();
+
+      const response = await this.got.get(`${this.getAliasDomain(alias)}/manage`);
+      const $ = cheerio.load(response.body);
+
+      const createInfo = $('.teaserbody p').eq(1).text().trim();
+      const lang = createInfo.startsWith('erstellt') ? 'de' : 'en';
+      const [creator, createDate] = createInfo.match(filter[lang].m)[1].split(filter[lang].s);
+
+      const [stories, comments, images, files] = $('.teaserbody strong')
+        .map((i, el) => parseInt($(el).text()))
+        .get();
+
+      const diskUsage = $('.diskusage > span').eq(0).attr('style').match(/(\d*)%/)[0];
+      const usedKB = parseInt($('.diskusage').eq(0).prev().text().match(/(\d*) KB/)[1]);
+      const trustedSite = parseInt(diskUsage) === 0 && usedKB > 0;
+
+      return {
+        creator,
+        createDate,
+        stories,
+        comments,
+        images,
+        files,
+        diskUsage,
+        usedKB,
+        trustedSite
+      };
+    } catch (err) {
+      console.log(chalk.red(`Error while getting infos of "${alias}" --> ${err}`));
+      return null;
     }
   }
 }
