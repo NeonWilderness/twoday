@@ -17,6 +17,8 @@ const diffPrefix = {
   grey: '  '
 };
 
+const cThrowAndExit = true;
+
 class Twoday {
   constructor(platform, userOptions = {}) {
     const defaults = { delay: 20, agreedVersion: '20190210a', silent: false };
@@ -54,7 +56,7 @@ class Twoday {
       const cookies = this.cookieJar.serializeSync().cookies;
       return cookies[2].key === 'avLoggedIn' && cookies[2].value === '1';
     } catch (err) {
-      throw new Error(`Must login before!`);
+      this.#handleError('Must login before!');
     }
   }
 
@@ -69,7 +71,7 @@ class Twoday {
       case 'prod':
         return 'net';
       default:
-        throw new Error(`Unknown platform code: "${this.platform}". Must be "dev" or "prod"!`);
+        this.#handleError(`Unknown platform code: "${this.platform}". Must be "dev" or "prod"!`);
     }
   }
 
@@ -87,10 +89,20 @@ class Twoday {
     return url.startsWith('//') ? `https:${url}` : url;
   }
 
+  #handleError(text, err, throwAndExit = false) {
+    const message = `${text}${err ? ' --> ' + err : ''}`;
+    if (throwAndExit) {
+      throw new Error(message);
+      process.exit(1);
+    } else {
+      console.log(chalk.red(message));
+    }
+  }
+
   async login() {
     try {
       if (typeof process.env.USER === 'undefined' || typeof process.env.PASSWORD === 'undefined')
-        throw new Error('Missing Twoday credentials in process.env.USER/PASSWORD');
+        this.#handleError('Missing Twoday credentials in process.env.USER/PASSWORD', null, cThrowAndExit);
 
       const loginUrl = `${this.baseUrl}/members/login`;
       let response = await this.got.get(loginUrl);
@@ -111,18 +123,20 @@ class Twoday {
       if (!this.silent) console.log(`Login to ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      console.log(chalk.red(`${this.fullDomain} login failed --> ${err}`));
+      this.#handleError(`${this.fullDomain} login failed`, err, cThrowAndExit);
     }
   }
 
   async logout() {
     try {
-      const response = await this.got.get(`${this.baseUrl}/members/logout`);
+      const response = await this.got.get('members/logout', {
+        prefixUrl: this.baseUrl
+      });
 
       if (!this.silent) console.log(`Logout of ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      console.log(chalk.red(`${this.fullDomain} logout failed --> ${err}`));
+      this.#handleError(`${this.fullDomain} logout failed`, err, cThrowAndExit);
     }
   }
 
@@ -137,8 +151,7 @@ class Twoday {
       }, []);
       return this.validHoptypes;
     } catch (err) {
-      console.log(chalk.red(`getValidHoptypes failed --> ${err}`));
-      process.exit(1);
+      this.#handleError('getValidHoptypes failed', err, cThrowAndExit);
     }
   }
 
@@ -181,7 +194,7 @@ class Twoday {
 
       return adminBlogs;
     } catch (err) {
-      throw new Error(`getMemberships failed --> ${err}`);
+      this.#handleError('getMemberships failed', err, cThrowAndExit);
     }
   }
 
@@ -189,7 +202,7 @@ class Twoday {
     try {
       this.checkLoggedIn();
 
-      const response = await this.got.get('layout/skins/modified', {
+      const response = await this.got.get('layout/skins/modified', { // #fixme
         prefixUrl: `${this.getAliasDomain(alias)}`
       });
 
@@ -203,7 +216,7 @@ class Twoday {
         })
         .get();
     } catch (err) {
-      throw new Error(`getModifiedSkins from "${alias}" failed --> ${err}`);
+      this.#handleError(`getModifiedSkins from "${alias}" failed`, err, cThrowAndExit);
     }
   }
 
@@ -222,7 +235,7 @@ class Twoday {
       result.url = result.isModified ? filtered[0].url : '';
       return result;
     } catch (err) {
-      throw new Error(`isModifiedSkin "${alias}/${skinName}" failed --> ${err}`);
+      this.#handleError(`isModifiedSkin "${alias}/${skinName}" failed`, err, cThrowAndExit);
     }
   }
 
@@ -251,7 +264,7 @@ class Twoday {
     try {
       return await this.#getLayoutData(alias);
     } catch (err) {
-      throw new Error(`getActiveLayoutUrl from "${alias}" failed --> ${err}`);
+      this.#handleError(`getActiveLayoutUrl from "${alias}" failed`, err, cThrowAndExit);
     }
   }
 
@@ -287,7 +300,7 @@ class Twoday {
 
       return layout;
     } catch (err) {
-      throw new Error(`useLayout "${alias}/${layoutName || '?'}" failed --> ${err}`);
+      this.#handleError(`useLayout "${alias}/${layoutName || '?'}" failed`, err, cThrowAndExit);
     }
   }
 
@@ -311,7 +324,7 @@ class Twoday {
         save: $('[name="save"]').val()
       });
     } catch (err) {
-      throw new Error(`getSkin "${skin.name}" failed --> ${err}`);
+      this.#handleError(`getSkin "${skin.name}" failed`, err, cThrowAndExit);
     }
   }
 
@@ -327,7 +340,7 @@ class Twoday {
         form: data
       });
     } catch (err) {
-      throw new Error(`postSkin "${skin.name}" failed --> ${err}`);
+      this.#handleError(`postSkin "${skin.name}" failed`, err, cThrowAndExit);
     }
   }
 
@@ -377,7 +390,7 @@ class Twoday {
         results: diffResults
       };
     } catch (err) {
-      throw err;
+      this.#handleError(`diffSkin of ${skinName} failed`, err, cThrowAndExit);
     }
   }
 
@@ -426,7 +439,7 @@ class Twoday {
         console.log(`Skin "${alias}/${skinName}" successfully updated (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      console.log(chalk.red(`Error while updating skin "${alias}/${skinName}" --> ${err}`));
+      this.#handleError(`Error while updating skin "${alias}/${skinName}"`, err);
     }
   }
 
@@ -454,7 +467,7 @@ class Twoday {
         console.log(`Skin "${alias}/${skinName}" successfully deleted (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      console.log(chalk.red(`Error while deleting skin "${alias}/${skinName}" --> ${err}`));
+      this.#handleError(`Error while deleting skin "${alias}/${skinName}"`, err);
     }
   }
 
@@ -485,7 +498,7 @@ class Twoday {
         console.log(`Skin "${alias}/${skinName}" successfully created (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      console.log(chalk.red(`Error while creating skin "${alias}/${skinName}" --> ${err}`));
+      this.#handleError(`Error while creating skin "${alias}/${skinName}"`, err);
     }
   }
 
@@ -517,8 +530,7 @@ class Twoday {
       }
       return allFiles;
     } catch (err) {
-      console.log(chalk.red(`Error while getting the files list of "${alias}" --> ${err}`));
-      return [];
+      this.#handleError(`Error while getting the list of files list for "${alias}"`, err, cThrowAndExit);
     }
   }
 
@@ -553,7 +565,7 @@ class Twoday {
         console.log(`File "${alias}/${fileName}" successfully deleted (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      console.log(chalk.red(`Error while deleting file "${alias}/${fileName}" --> ${err}`));
+      this.#handleError(`Error while deleting file "${alias}/${fileName}"`, err, cThrowAndExit);
     }
   }
 
@@ -579,7 +591,7 @@ class Twoday {
         console.log(`File "${alias}/${file.name}" successfully created (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      console.log(chalk.red(`Error while creating file "${alias}/${file.name}" --> ${err}`));
+      this.#handleError(`Error while creating file "${alias}/${file.name}"`, err, cThrowAndExit);
     }
   }
 
@@ -589,7 +601,7 @@ class Twoday {
       if (fileExists) await this.deleteFile(alias, file.name);
       await this.createFile(alias, file);
     } catch (err) {
-      console.log(chalk.red(`Error while updating file "${alias}/${file.name}" --> ${err}`));
+      this.#handleError(`Error while updating file "${alias}/${file.name}"`, err, cThrowAndExit);
     }
   }
 
@@ -625,7 +637,7 @@ class Twoday {
 
     if (!story.action) story.action = 'save';
     else if (!['save', 'publish'].includes(story.action))
-      throw new Error('Story action param must be "save" or "publish".');
+      this.#handleError('Story action param must be "save" or "publish".', null, cThrowAndExit);
   }
 
   async hasStory(alias, id) {
@@ -640,6 +652,8 @@ class Twoday {
 
   async createStory(alias, story) {
     try {
+      this.checkLoggedIn();
+
       this.#validateStory(story);
 
       const storyCreateUrl = `${this.getAliasDomain(alias)}/stories/create`;
@@ -669,7 +683,7 @@ class Twoday {
         console.log(`Story "${alias}/${story.niceurl}" successfully created (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      console.log(chalk.red(`Error while creating story "${alias}/${story.niceurl}" --> ${err}`));
+      this.#handleError(`Error while creating story "${alias}/${story.niceurl}"`, err, cThrowAndExit);
     }
   }
 
@@ -690,6 +704,8 @@ class Twoday {
 
   async updateStory(alias, story) {
     try {
+      this.checkLoggedIn();
+
       this.#validateStory(story);
 
       const storyID = story.id || story.niceurl;
@@ -721,7 +737,7 @@ class Twoday {
         console.log(`Story "${alias}/${storyID}" successfully updated (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      console.log(chalk.red(`Error while updating story "${alias}/${storyID}" --> ${err}`));
+      this.#handleError(`Error while updating story "${alias}/${storyID}"`, err, cThrowAndExit);
     }
   }
 
@@ -738,7 +754,7 @@ class Twoday {
         })
         .get();
     } catch (err) {
-      console.log(chalk.red(`Error while reading story topics of "${alias}" --> ${err}`));
+      this.#handleError(`Error while reading story topics of "${alias}"`, err, cThrowAndExit);
     }
   }
 
@@ -765,7 +781,7 @@ class Twoday {
       if (!this.silent) console.log(`Layout "${alias}/${layout.name}" successfully downloaded.`);
       return true;
     } catch (err) {
-      console.log(chalk.red(`Error while downloading layout "${alias}/${layout.name}" --> ${err}`));
+      this.#handleError(`Error while downloading layout "${alias}/${layout.name}"`, err, cThrowAndExit);
     }
   }
 
@@ -776,7 +792,7 @@ class Twoday {
       let el = $('body')[0];
       return el.attribs['data-version'] || 'N/A';
     } catch (err) {
-      console.log(chalk.red(`Error while checking alien version of "${alias}" --> ${err}`));
+      this.#handleError(`Error while checking alien version of "${alias}"`, err);
     }
   }
 
@@ -799,8 +815,17 @@ class Twoday {
         .map((i, el) => parseInt($(el).text()))
         .get();
 
-      const diskUsage = $('.diskusage > span').eq(0).attr('style').match(/(\d*)%/)[0];
-      const usedKB = parseInt($('.diskusage').eq(0).prev().text().match(/(\d*) KB/)[1]);
+      const diskUsage = $('.diskusage > span')
+        .eq(0)
+        .attr('style')
+        .match(/(\d*)%/)[0];
+      const usedKB = parseInt(
+        $('.diskusage')
+          .eq(0)
+          .prev()
+          .text()
+          .match(/(\d*) KB/)[1]
+      );
       const trustedSite = parseInt(diskUsage) === 0 && usedKB > 0;
 
       return {
@@ -815,8 +840,7 @@ class Twoday {
         trustedSite
       };
     } catch (err) {
-      console.log(chalk.red(`Error while getting infos of "${alias}" --> ${err}`));
-      return null;
+      this.#handleError(`Error while getting infos of "${alias}"`, err, cThrowAndExit);
     }
   }
 }
