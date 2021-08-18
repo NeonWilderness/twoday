@@ -202,9 +202,8 @@ class Twoday {
     try {
       this.checkLoggedIn();
 
-      const response = await this.got.get('layout/skins/modified', { // #fixme
-        prefixUrl: `${this.getAliasDomain(alias)}`
-      });
+      const prefixUrl = await this.getActiveLayoutUrl(alias);
+      const response = await this.got.get('skins/modified', { prefixUrl });
 
       const $ = cheerio.load(response.body);
       const modSkins = $('.skin>a');
@@ -216,7 +215,7 @@ class Twoday {
         })
         .get();
     } catch (err) {
-      this.#handleError(`getModifiedSkins from "${alias}" failed`, err, cThrowAndExit);
+      this.#handleError(`getModifiedSkins from "${prefixUrl}" failed`, err, cThrowAndExit);
     }
   }
 
@@ -264,7 +263,7 @@ class Twoday {
     try {
       return await this.#getLayoutData(alias);
     } catch (err) {
-      this.#handleError(`getActiveLayoutUrl from "${alias}" failed`, err, cThrowAndExit);
+      this.#handleError(`getLayout from "${alias}" failed`, err, cThrowAndExit);
     }
   }
 

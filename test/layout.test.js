@@ -9,7 +9,7 @@ const alias = 'foundation';
 const layoutName = 'alien';
 
 describe('Can work with Twoday layouts', () => {
-  xit('should get the layout data', async () => {
+  it('should get the layout data', async () => {
     await td.login();
     const layout = await td.getLayout(alias);
     expect(layout.layoutNames).toContain('twoday30');
@@ -19,26 +19,26 @@ describe('Can work with Twoday layouts', () => {
     expect(layout.activeLayoutUrl).toBe('https://foundation.twoday.net/layouts/twoday30');
   });
 
-  xit('should get the layout url', async () => {
+  it('should get the layout url', async () => {
     await td.login();
     const url = await td.getActiveLayoutUrl(alias);
     expect(url).toBe('https://foundation.twoday.net/layouts/twoday30');
   });
 
-  xit('should get the layout name', async () => {
+  it('should get the layout name', async () => {
     await td.login();
     const name = await td.getActiveLayoutName(alias);
     expect(name).toBe('twoday30');
   });
 
-  xit('should use another layout name', async () => {
+  it('should use another layout name', async () => {
     await td.login();
     const layout = await td.useLayout(alias, layoutName);
     expect(layout.activeLayoutName).toBe(layoutName);
     expect(layout.activeLayoutUrl).toBe('https://foundation.twoday.net/layouts/alien');
   });
 
-  xit('should throw when layout name is missing', async () => {
+  it('should throw when layout name is missing', async () => {
     try {
       await td.login();
       await td.useLayout(alias);
@@ -47,7 +47,7 @@ describe('Can work with Twoday layouts', () => {
     }
   });
 
-  xit('should throw when layout name does not exist', async () => {
+  it('should throw when layout name does not exist', async () => {
     try {
       await td.login();
       await td.useLayout(alias, 'unkownLayoutName');
@@ -56,7 +56,7 @@ describe('Can work with Twoday layouts', () => {
     }
   });
 
-  xit('should retain a changed layout name', async () => {
+  it('should retain a changed layout name', async () => {
     await td.login();
     const layout = await td.useLayout(alias, 'alien');
     expect(layout.activeLayoutName).toBe('alien');
@@ -76,7 +76,21 @@ describe('Can work with Twoday layouts', () => {
     expect(layoutRefreshed.activeLayoutName).toBe('twoday30');
   });
 
-  xit('should download a layout as a zip file', async () => {
+  it('should return modified skins of a changed layout name', async () => {
+    await td.login();
+    const testAlias = 'neonwilderness';
+    const layoutInitial = await td.getLayout(testAlias);
+    expect(layoutInitial.activeLayoutName).toBe('rainy');
+
+    const layoutUsed = await td.useLayout(testAlias, 'export');
+    expect(layoutUsed.activeLayoutName).toBe('export');
+
+    const modSkins = await td.getModifiedSkins(testAlias);
+    expect(modSkins.length).toBe(11);
+    expect(modSkins.filter(skin => skin.name === 'Site.twodayExport')).toHaveLength(1);
+  });
+
+  it('should download a layout as a zip file', async () => {
     const layout = {
       name: layoutName,
       path: path.resolve(process.cwd(), 'test', `${layoutName}-layout.zip`)
