@@ -118,6 +118,7 @@ declare class Twoday {
   createFile(alias: string, file: tFileInfo): Promise<Response>;
   updateFile(alias: string, file: tFileInfo): Promise<Response>;
   // stories
+  getStory(alias: string, id: string): Promise<Response> | null;
   hasStory(alias: string, id: string): Promise<boolean>;
   createStory(alias: string, story: tStoryInfo): Promise<Response>;
   updateStory(alias: string, story: tStoryInfo): Promise<Response>;

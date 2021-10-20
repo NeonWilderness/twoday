@@ -639,14 +639,18 @@ class Twoday {
       this.#handleError('Story action param must be "save" or "publish".', null, cThrowAndExit);
   }
 
-  async hasStory(alias, id) {
+  async getStory(alias, id) {
     try {
       const storyUrl = `${this.getAliasDomain(alias)}/stories/${id}`;
-      await this.got.get(storyUrl);
-      return true;
+      return await this.got.get(storyUrl);
     } catch (err) {
-      return false;
+      return null;
     }
+  }
+
+  async hasStory(alias, id) {
+    const response = await this.getStory(alias, id);
+    return !!response;
   }
 
   async createStory(alias, story) {

@@ -6,7 +6,7 @@ const td = new Twoday('prod');
 const alias = 'foundation';
 
 describe('Can work with Twoday stories', () => {
-  it('should create a new story as unpublished', async () => {
+  xit('should create a new story as unpublished', async () => {
     const rnd = Math.floor(Math.random() * 99);
     const story = {
       title: `Title No.${rnd.toString().padStart(2, '0')}`,
@@ -16,7 +16,7 @@ describe('Can work with Twoday stories', () => {
     return await td.createStory(alias, story);
   });
 
-  it('should update/publish a story by id', async () => {
+  xit('should update/publish a story by id', async () => {
     const story = {
       title: `Title No.11`,
       id: 1022684884,
@@ -27,7 +27,7 @@ describe('Can work with Twoday stories', () => {
     return await td.updateStory(alias, story);
   });
 
-  it('should unpublish a published story', async () => {
+  xit('should unpublish a published story', async () => {
     const story = {
       title: `Title No.11`,
       id: 1022684884,
@@ -47,7 +47,7 @@ describe('Can work with Twoday stories', () => {
     expect(result).toBeFalsy();
   });
 
-  it('should return all story topics', async () => {
+  xit('should return all story topics', async () => {
     await td.login();
     let result = await td.getStoryTopics(alias);
     expect(Array.isArray(result)).toBeTruthy();
