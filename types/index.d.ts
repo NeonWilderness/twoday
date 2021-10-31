@@ -74,6 +74,18 @@ interface tStoryInfo {
   publish?: string;
   action?: tStoryAction;
 }
+interface tStoryListItem {
+  id: tStoryID;
+  createDate: string;
+  title: string;
+}
+interface tStoryList {
+  fromPage: number;
+  toPage: number;
+  maxPage: number;
+  stories: tStoryListItem[];
+  total: number;
+}
 type tAlienVersion = string | 'N/A';
 interface tAliasInfo {
   creator: string,
@@ -118,6 +130,7 @@ declare class Twoday {
   createFile(alias: string, file: tFileInfo): Promise<Response>;
   updateFile(alias: string, file: tFileInfo): Promise<Response>;
   // stories
+  listStories(alias: string, fromPage?: number, toPage?: number): Promise<tStoryList[]>;
   getStory(alias: string, id: string): Promise<Response> | null;
   hasStory(alias: string, id: string): Promise<boolean>;
   createStory(alias: string, story: tStoryInfo): Promise<Response>;

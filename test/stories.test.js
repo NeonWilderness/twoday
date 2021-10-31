@@ -1,3 +1,4 @@
+const cheerio = require('cheerio');
 const Twoday = require('../src/index');
 require('dotenv-safe').config();
 
@@ -6,7 +7,7 @@ const td = new Twoday('prod');
 const alias = 'foundation';
 
 describe('Can work with Twoday stories', () => {
-  xit('should create a new story as unpublished', async () => {
+  it('should create a new story as unpublished', async () => {
     const rnd = Math.floor(Math.random() * 99);
     const story = {
       title: `Title No.${rnd.toString().padStart(2, '0')}`,
@@ -16,7 +17,7 @@ describe('Can work with Twoday stories', () => {
     return await td.createStory(alias, story);
   });
 
-  xit('should update/publish a story by id', async () => {
+  it('should update/publish a story by id', async () => {
     const story = {
       title: `Title No.11`,
       id: 1022684884,
@@ -27,7 +28,7 @@ describe('Can work with Twoday stories', () => {
     return await td.updateStory(alias, story);
   });
 
-  xit('should unpublish a published story', async () => {
+  it('should unpublish a published story', async () => {
     const story = {
       title: `Title No.11`,
       id: 1022684884,
@@ -35,6 +36,22 @@ describe('Can work with Twoday stories', () => {
     };
     await td.login();
     return await td.updateStory(alias, story);
+  });
+
+  it('should get a story by numeric id', async () => {
+    let res = await td.getStory(alias, '1022380953');
+    expect(res).toBeTruthy();
+    const $ = cheerio.load(res.body);
+    expect($('.storyTitle>a').eq(0).text()).toBe('Bacon Ipsum Text');
+    expect($('.storyContent>p').eq(0).text()).toMatch(/^Sausage kevin/);
+  });
+
+  it('should get a story by nice url', async () => {
+    let res = await td.getStory(alias, 'baconipsum');
+    expect(res).toBeTruthy();
+    const $ = cheerio.load(res.body);
+    expect($('.storyTitle>a').eq(0).text()).toBe('Bacon Ipsum Text');
+    expect($('.storyContent>p').eq(0).text()).toMatch(/^Sausage kevin/);
   });
 
   it('should check if a story exists', async () => {
@@ -47,7 +64,7 @@ describe('Can work with Twoday stories', () => {
     expect(result).toBeFalsy();
   });
 
-  xit('should return all story topics', async () => {
+  it('should return all story topics', async () => {
     await td.login();
     let result = await td.getStoryTopics(alias);
     expect(Array.isArray(result)).toBeTruthy();

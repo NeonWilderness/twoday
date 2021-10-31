@@ -639,6 +639,35 @@ class Twoday {
       this.#handleError('Story action param must be "save" or "publish".', null, cThrowAndExit);
   }
 
+  async listStories(alias, fromPage = 0, toPage) {
+    try {
+      const info = await this.getInfo(alias);
+      const maxPage = Math.floor(info.stories / 20);
+      if (typeof toPage === 'undefined' || toPage > maxPage) toPage = maxPage;
+      if (fromPage > toPage) throw new Error(`fromPage (=${fromPage}) must not be greater than toPage (=${toPage})`);
+      const storiesPageUrl = `${this.getAliasDomain(alias)}/stories/?page=`;
+
+      let stories = [];
+      for (let i = fromPage; i <= toPage; i++) {
+        await this.delayNextPromise();
+        const response = await this.got.get(`${storiesPageUrl}${i}`);
+        const $ = cheerio.load(response.body);
+
+        $('tbody').each((index, el) => {
+          let $el = $(el);
+          let title = $el.find('tr>td>b').text().trim();
+          let leftColText = $el.find('td.leftCol').text().trim();
+          let id = leftColText.match(/story id="(\d*)"/)[1];
+          let createDate = leftColText.slice(-16);
+          stories.push({ id, createDate, title });
+        });
+      }
+      return { fromPage, toPage, maxPage, stories, total: info.stories };
+    } catch (err) {
+      this.#handleError(`Error while getting story list of "${alias}"`, err, cThrowAndExit);
+    }
+  }
+
   async getStory(alias, id) {
     try {
       const storyUrl = `${this.getAliasDomain(alias)}/stories/${id}`;
