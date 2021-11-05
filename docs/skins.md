@@ -1,5 +1,5 @@
 
-[> Back to homepage](../README.md#documentation)
+[> Back to Topic Directory](../README.md#topic-related-class-functions)
 
 ## Skin Functions
 ### Introduction
@@ -21,7 +21,7 @@ alias | string | a blog's alias
 - requires: successful login
 - returns: array of tNameUrl object
 
-Property | Type | Text
+tNameUrl Property | Type | Text
 --- | --- | --- 
 name | string | skinName, e.g. Site.style
 url | string | url of the skin
@@ -47,7 +47,7 @@ skinName | string | a skin's qualifier, e.g. *Site.page*
 - requires: successful login
 - returns: tIsModifiedSkin object
 
-Property | Type | Text
+tIsModifiedSkin Property | Type | Text
 --- | --- | --- 
 valid | boolean | true=is a valid hoptype
 prototype | string | prototype part of skinName, e.g. *Site*
@@ -78,7 +78,7 @@ url | string | url of the skin
 - requires: successful login
 - returns: tSkinEnriched object
 
-Property | Type | Text
+tSkinEnriched Property | Type | Text
 --- | --- | --- 
 name | string | a skin's qualifier, e.g. site.page
 url | string | url of the skin
@@ -112,7 +112,7 @@ if (s.isModified) {
 
 postSkin() is a low-level function used by functions such as createSkin(), updateSkin() or deleteSkin().
 
-tSkin Param | Type | Text
+tSkinEnriched Param | Type | Text
 --- | --- | --- 
 secretKey | string | secretKey needed for http post
 action | string | action
@@ -125,7 +125,7 @@ skin | string | the skin's content
 save | string | save
 
 - requires: successful login
-- returns: http response
+- returns: http post response
 
 #### Example: Get a skin and post it with a new title
 ```
@@ -213,7 +213,7 @@ skinName | string | the skin's qualifier, e.g. *Site.obsolete*
 - requires: successful login
 - returns: http post response
 
-> The skin is deleted only if it is a modified or custom skin!
+> A skin will only be deleted if it is a modified or custom skin!
 
 #### Example: Delete skin *Site.obsolete* of blog alias *neonwilderness*
 ```
