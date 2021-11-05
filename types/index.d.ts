@@ -75,7 +75,7 @@ interface tStoryInfo {
   action?: tStoryAction;
 }
 interface tStoryListItem {
-  id: tStoryID;
+  id: string;
   createDate: string;
   title: string;
 }

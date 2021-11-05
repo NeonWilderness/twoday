@@ -81,7 +81,7 @@ class Twoday {
   }
 
   #getSecretKey(data) {
-    let $ = cheerio.load(data);
+    const $ = cheerio.load(data);
     return $('[name="secretKey"]').val();
   }
 
@@ -89,13 +89,12 @@ class Twoday {
     return url.startsWith('//') ? `https:${url}` : url;
   }
 
-  #handleError(text, err, throwAndExit = false) {
+  #handleError(text, err = null, throwAndExit = false) {
     const message = `${text}${err ? ' --> ' + err : ''}`;
+    console.log(chalk.red(message));
     if (throwAndExit) {
-      throw new Error(message);
+      console.log(chalk.red('Process halted.'));
       process.exit(1);
-    } else {
-      console.log(chalk.red(message));
     }
   }
 
@@ -136,7 +135,7 @@ class Twoday {
       if (!this.silent) console.log(`Logout of ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      this.#handleError(`${this.fullDomain} logout failed`, err, cThrowAndExit);
+      this.#handleError(`${this.fullDomain} logout failed`);
     }
   }
 
@@ -720,7 +719,7 @@ class Twoday {
   }
 
   #getStoryParams(data) {
-    let $ = cheerio.load(data);
+    const $ = cheerio.load(data);
     return {
       secretKey: $('[name="secretKey"]').val(),
       content_title: $('[name="content_title"]').val(),
@@ -819,9 +818,9 @@ class Twoday {
 
   async checkUserAlienVersion(alias) {
     try {
-      let response = await this.got.get(`${this.getAliasDomain(alias)}`);
-      let $ = cheerio.load(response.body);
-      let el = $('body')[0];
+      const response = await this.got.get(`${this.getAliasDomain(alias)}`);
+      const $ = cheerio.load(response.body);
+      const el = $('body')[0];
       return el.attribs['data-version'] || 'N/A';
     } catch (err) {
       this.#handleError(`Error while checking alien version of "${alias}"`, err);
@@ -851,6 +850,7 @@ class Twoday {
         .eq(0)
         .attr('style')
         .match(/(\d*)%/)[0];
+
       const usedKB = parseInt(
         $('.diskusage')
           .eq(0)
