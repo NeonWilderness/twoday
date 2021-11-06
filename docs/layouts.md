@@ -24,7 +24,7 @@ activeLayoutUrl | string | the active layout's URL
 activeLayoutName | string | the name of the currently active layout
 layoutNames | string[] | the names of all available layouts for this blog
 
-#### Example: Log the alien layout URL of blog alias 'mmm'
+#### Example: Switch to the alien layout of blog 'mmm' and log its URL
 ```
 const td = new Twoday('prod');
 await td.login();
@@ -71,7 +71,7 @@ alias | string | a blog's alias
 
 > This is a syntactic sugar function to the full info provider function *getLayout()*.
 
-#### Example: Log the active layout name of blog 'neonwilderness'
+#### Example: Log the active layout url of blog 'neonwilderness'
 ```
 const td = new Twoday('prod');
 await td.login();
@@ -101,7 +101,7 @@ console.log(`Neon's active layout name is "${name}"`);
 ```
 <hr>
 
-### Get the actual layout name
+### Get all layout names of a blog
 #### .getLayoutNames(alias: string): Promise&lt;string[]&gt;
 
 Param | Type | Text
@@ -123,7 +123,7 @@ console.log(The ${alias} blog features the following layouts: ${layouts.join(', 
 ```
 <hr>
 
-### Get the actual layout name
+### Download a specific layout as a zipped file
 #### .downloadLayout(alias: string, layout: tLayoutInfo): Promise&lt;Response&gt;
 
 Param | Type | Text
