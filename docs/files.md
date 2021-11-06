@@ -21,7 +21,8 @@ alias | string | a blog's alias
 ```
 const td = new Twoday('prod');
 await td.login();
-const files = await td.listFiles('mmm');
+const alias = 'mmm';
+const files = await td.listFiles(alias);
 console.log(`Blog "${alias}" features the following files:`);
 files.forEach(fileName => console.log(fileName));
 ```
@@ -124,7 +125,7 @@ fileName | string | a file name
 - requires: successful login
 - returns: http post response
 
-#### Example: Create a JSON file with the name "version" on blog alias *neonwilderness*
+#### Example: Create a test JavaScript file and immediately delete it again
 ```
 const path = require('path');
 ...

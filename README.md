@@ -109,8 +109,8 @@ await td.logout();
 
 Please refer to the following sub-pages for topic related documentation:
 
-Topic/Area | Text
---- | ---
+**Topic/Area**
+
 - [x] [Skins](./docs/skins.md) | Functions related to Twoday Skins
 - [x] [Files](./docs/files.md) | Functions related to Twoday Files
 - [x] [Stories](./docs/stories.md) | Functions related to Twoday Stories
