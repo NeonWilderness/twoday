@@ -111,9 +111,9 @@ Please refer to the following sub-pages for topic related documentation:
 
 Topic/Area | Text
 --- | ---
-[Skins](./docs/skins.md) | Functions related to Twoday Skins
-[Files](./docs/files.md) | Functions related to Twoday Files
-[Stories](./docs/stories.md) | Functions related to Twoday Stories
-[Layouts](./docs/layouts.md) | Functions related to Twoday Layouts
-[Special](./docs/special.md) | Special purpose functions
-[Helper](./docs/helper.md) | Useful helper functions
+- [x] [Skins](./docs/skins.md) | Functions related to Twoday Skins
+- [x] [Files](./docs/files.md) | Functions related to Twoday Files
+- [x] [Stories](./docs/stories.md) | Functions related to Twoday Stories
+- [x] [Layouts](./docs/layouts.md) | Functions related to Twoday Layouts
+- [x] [Special](./docs/special.md) | Special purpose functions
+- [x] [Helper](./docs/helper.md) | Useful helper functions

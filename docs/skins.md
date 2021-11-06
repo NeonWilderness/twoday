@@ -8,7 +8,7 @@ Twoday skins are organized in layouts. A blog can have multiple layouts, however
 
 All skin functions usually target the currently active layout. If you want to adress skins in a non-active layout, you <u>must</u> call the "useLayout"-function before utilizing any subsequent skin functions!
 
-> *The code examples below are very condensed and intentionally omit the recommended try..catch construct as well as the async framing.*
+> *Please be aware, that the code examples below are very condensed and intentionally omit the recommended try..catch construct as well as the async framing.*
 <hr>
 
 ### Get a list of modified skins
@@ -23,7 +23,7 @@ alias | string | a blog's alias
 
 tNameUrl Property | Type | Text
 --- | --- | --- 
-name | string | skinName, e.g. Site.style
+name | string | skin qualifier, e.g. *Site.style*
 url | string | url of the skin
 
 #### Example: Create prod instance and log the list of modified skins of the 'mmm' blog
@@ -82,7 +82,7 @@ tSkinEnriched Property | Type | Text
 --- | --- | --- 
 name | string | a skin's qualifier, e.g. site.page
 url | string | url of the skin
-secretKey | string | secretKey needed for http post
+secretKey | string | secretKey
 action | string | action
 key | string | key
 skinset | string | skinset
@@ -114,7 +114,7 @@ postSkin() is a low-level function used by functions such as createSkin(), updat
 
 tSkinEnriched Param | Type | Text
 --- | --- | --- 
-secretKey | string | secretKey needed for http post
+secretKey | string | secretKey
 action | string | action
 key | string | key
 skinset | string | skinset
