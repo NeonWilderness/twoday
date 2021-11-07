@@ -102,7 +102,7 @@ interface tAliasInfo {
 declare class Twoday {
   constructor(platform: tPlatform, userOptions?: tUserOptions);
   checkLoggedIn(): void;
-  delayNextPromise(): void;
+  delayNextPromise(): Promise<void>;
   #getDomain(): string;
   getAliasDomain(alias: string): string;
   #getSecretKey(data: string): string;

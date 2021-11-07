@@ -1,7 +1,7 @@
 
 [> Back to Topic Directory](../README.md#topic-related-class-functions)
 
-## Files Functions
+## Specialized Functions
 ### Introduction
 
 > *Please be aware, that the code examples below are very condensed and intentionally omit the recommended try..catch construct as well as the async framing.*
