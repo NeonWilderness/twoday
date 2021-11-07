@@ -846,19 +846,16 @@ class Twoday {
         .map((i, el) => parseInt($(el).text()))
         .get();
 
-      const diskUsage = $('.diskusage > span')
-        .eq(0)
-        .attr('style')
-        .match(/(\d*)%/)[0];
+      const diskUsageNumbers = $('.diskusage').eq(0).prev().text().trim().match(/(\d+)/g);
 
-      const usedKB = parseInt(
-        $('.diskusage')
-          .eq(0)
-          .prev()
-          .text()
-          .match(/(\d*) KB/)[1]
-      );
-      const trustedSite = parseInt(diskUsage) === 0 && usedKB > 0;
+      const usedKB = Number(diskUsageNumbers[0]);
+
+      const diskUsage =
+        diskUsageNumbers.length === 2
+          ? Math.round(usedKB / Number(diskUsageNumbers[1]) * 1000) / 10
+          : 0;
+
+      const trustedSite = diskUsage === 0;
 
       return {
         creator,

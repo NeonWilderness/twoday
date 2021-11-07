@@ -1,5 +1,5 @@
 <div style="text-align:center;margin:20px auto">
-  <img src="./docs/twoday.jpg" style="border:4px solid #5a6a3b" />
+  <img src="./docs/twoday.jpg" style="border:4px solid #5a6a3b;display:block" />
 </div>
 
 > This is a Node module to help interact with the most relevant functions of the **twoday.net** blogger platform

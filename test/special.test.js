@@ -17,15 +17,17 @@ describe('Can return info about an alias', () => {
   it('should get infos about a normal alias', async () => {
     await td.login();
     const infos = await td.getInfo('neonwilderness');
+    console.log(infos);
     expect(typeof infos).toBe('object');
     expect(infos).not.toBeNull();
     expect(Object.keys(infos)).toHaveLength(9);
     expect(infos.creator).toBe('NeonWilderness');
     expect(infos.createDate).toBe('24.10.2006 01:52');
-    expect(infos.stories).toBeGreaterThan(380);
-    expect(infos.comments).toBeGreaterThan(5740);
-    expect(infos.images).toBeGreaterThan(60);
+    expect(infos.stories).toBeGreaterThan(390);
+    expect(infos.comments).toBeGreaterThan(5770);
+    expect(infos.images).toBeGreaterThan(70);
     expect(infos.files).toBeGreaterThan(4);
+    expect(infos.diskUsage).toBeGreaterThan(6.5);
     expect(infos.usedKB).toBeGreaterThan(5970);
     expect(infos.trustedSite).toBeFalsy();
   });
@@ -33,12 +35,13 @@ describe('Can return info about an alias', () => {
   it('should get infos about a trusted site alias', async () => {
     await td.login();
     const infos = await td.getInfo('kunstbetrieb');
+    console.log(infos);
     expect(typeof infos).toBe('object');
     expect(infos).not.toBeNull();
     expect(Object.keys(infos)).toHaveLength(9);
     expect(infos.creator).toBe('kunstbetrieb');
     expect(infos.createDate).toBe('07.11.2008 00:31');
-    expect(infos.diskUsage).toBe('0%');
+    expect(infos.diskUsage).toBe(0);
     expect(infos.usedKB).toBeGreaterThan(102400);
     expect(infos.trustedSite).toBeTruthy();
   });

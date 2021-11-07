@@ -94,7 +94,7 @@ interface tAliasInfo {
   comments: number,
   images: number,
   files: number,
-  diskUsage: string,
+  diskUsage: number,
   usedKB: number,
   trustedSite: boolean
 }
