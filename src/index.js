@@ -500,8 +500,8 @@ class Twoday {
     }
   }
 
-  async listFiles(alias) {
-    const returnFilesOnPage = $$ =>
+  async listItems(alias, resType) {
+    const returnItemsOnPage = $$ =>
       $$('.listItem b')
         .map((i, el) => $$(el).text())
         .get();
@@ -509,27 +509,31 @@ class Twoday {
     try {
       this.checkLoggedIn();
 
-      const filesUrl = `${this.getAliasDomain(alias)}/files/?page=`;
+      const resUrl = `${this.getAliasDomain(alias)}/${resType}/?page=`;
 
-      let response = await this.got.get(`${filesUrl}0`);
+      let response = await this.got.get(`${resUrl}0`);
       let $ = cheerio.load(response.body);
-      let allFiles = returnFilesOnPage($);
+      let allItems = returnItemsOnPage($);
       let maxPage = 0;
       const $pageNav = $('.pageNavSummary:first'); // e.g. "zeige 1-20 (von 70)"
       if ($pageNav) {
-        const totalFiles = parseInt($pageNav.text().split(' ').pop());
-        maxPage = Math.floor(totalFiles / 20);
+        const totalItems = parseInt($pageNav.text().split(' ').pop());
+        maxPage = Math.floor(totalItems / 20);
       }
 
       for (let page = 1; page <= maxPage; page++) {
         await this.delayNextPromise();
-        response = await this.got.get(`${filesUrl}${page}`);
-        allFiles = allFiles.concat(returnFilesOnPage(cheerio.load(response.body)));
+        response = await this.got.get(`${resUrl}${page}`);
+        allItems = allItems.concat(returnItemsOnPage(cheerio.load(response.body)));
       }
-      return allFiles;
+      return allItems;
     } catch (err) {
       this.#handleError(`Error while getting the list of files list for "${alias}"`, err, cThrowAndExit);
     }
+  }
+
+  async listFiles(alias) {
+    return await this.listItems(alias, 'files');
   }
 
   async hasFile(alias, fileName) {
@@ -601,6 +605,10 @@ class Twoday {
     } catch (err) {
       this.#handleError(`Error while updating file "${alias}/${file.name}"`, err, cThrowAndExit);
     }
+  }
+
+  async listImages(alias) {
+    return await this.listItems(alias, 'images');
   }
 
   getNiceUrl(url) {

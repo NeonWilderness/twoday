@@ -1,4 +1,5 @@
 type tPlatform = 'dev' | 'prod';
+type tResType = 'files' | 'images';
 
 interface tUserOptions {
   delay?: number;
@@ -123,12 +124,16 @@ declare class Twoday {
   updateSkin(alias: string, skinName: string, options: tSkinOptions): Promise<Response>;
   deleteSkin(alias: string, skinName: string): Promise<Response>;
   createSkin(alias: string, skinName: string, options?: tSkinOptions): Promise<Response>;
+  // helper
+  listItems(alias: string, resType:tResType): Promise<string[]>;
   // files
   listFiles(alias: string): Promise<string[]>;
   hasFile(alias: string, fileName: string): Promise<boolean>;
   deleteFile(alias: string, fileName: string): Promise<Response>;
   createFile(alias: string, file: tFileInfo): Promise<Response>;
   updateFile(alias: string, file: tFileInfo): Promise<Response>;
+  // images
+  listImages(alias: string): Promise<string[]>;
   // stories
   listStories(alias: string, fromPage?: number, toPage?: number): Promise<tStoryList[]>;
   getStory(alias: string, id: string): Promise<Response> | null;
