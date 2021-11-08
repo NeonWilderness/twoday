@@ -50,6 +50,11 @@ interface tDiffResults {
   skinChanged: boolean;
   results: tDiffResult[];
 }
+interface tResourceInfo {
+  name: string;
+  mime: string;
+  url: string;
+}
 interface tFileInfo {
   name: string;
   path: string;
@@ -125,15 +130,15 @@ declare class Twoday {
   deleteSkin(alias: string, skinName: string): Promise<Response>;
   createSkin(alias: string, skinName: string, options?: tSkinOptions): Promise<Response>;
   // helper
-  listItems(alias: string, resType:tResType): Promise<string[]>;
+  listItems(alias: string, resType:tResType): Promise<tResourceInfo[]>;
   // files
-  listFiles(alias: string): Promise<string[]>;
+  listFiles(alias: string): Promise<tResourceInfo[]>;
   hasFile(alias: string, fileName: string): Promise<boolean>;
   deleteFile(alias: string, fileName: string): Promise<Response>;
   createFile(alias: string, file: tFileInfo): Promise<Response>;
   updateFile(alias: string, file: tFileInfo): Promise<Response>;
   // images
-  listImages(alias: string): Promise<string[]>;
+  listImages(alias: string): Promise<tResourceInfo[]>;
   // stories
   listStories(alias: string, fromPage?: number, toPage?: number): Promise<tStoryList[]>;
   getStory(alias: string, id: string): Promise<Response> | null;

@@ -42,8 +42,16 @@ describe('Can work with Twoday files', () => {
     return td.login()
       .then(() => td.listFiles(alias))
       .then(files => {
+        // console.log(files);
         expect(Array.isArray(files)).toBeTruthy();
         expect(files.length).toBeGreaterThan(60);
+        expect(typeof files[0]).toBe('object');
+        const k = Object.keys(files[0]);
+        expect(k).toHaveLength(3);
+        expect(k).toContain('name');
+        expect(k).toContain('mime');
+        expect(k).toContain('url');
+
       });
   });
 });

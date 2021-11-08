@@ -502,8 +502,15 @@ class Twoday {
 
   async listItems(alias, resType) {
     const returnItemsOnPage = $$ =>
-      $$('.listItem b')
-        .map((i, el) => $$(el).text())
+      $$('.leftCol')
+        .map((i, el) => {
+          const $$el = $$(el);
+          const parts = $$el.text().split('/');
+          const name = parts[0].match(/name="(.*?)"/)[1];
+          const mime = parts[1].split(', ')[0].split('-').pop().trim();
+          const url = this.fixURL($$el.next().find('a').eq(0).attr('href'));
+          return { name, mime, url };
+        })
         .get();
 
     try {
