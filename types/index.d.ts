@@ -55,10 +55,24 @@ interface tResourceInfo {
   mime: string;
   url: string;
 }
+type tFileID = string;
 interface tFileInfo {
   name: string;
   path: string;
   description: string;
+}
+type tImageID = string;
+type tResizeTo = 'max' | 'crop' | 'scale' | 'exact' | 'no';
+interface tImageInfo {
+  alias?: string;
+  path?: string;
+  url?: string;
+  alttext?: string;
+  addToTopic?: string;
+  topic?: string;
+  resizeto?: tResizeTo;
+  width?: string;
+  height?: string;
 }
 interface tLayoutInfo {
   name: string;
@@ -135,10 +149,13 @@ declare class Twoday {
   listFiles(alias: string): Promise<tResourceInfo[]>;
   hasFile(alias: string, fileName: string): Promise<boolean>;
   deleteFile(alias: string, fileName: string): Promise<Response>;
-  createFile(alias: string, file: tFileInfo): Promise<Response>;
-  updateFile(alias: string, file: tFileInfo): Promise<Response>;
+  createFile(alias: string, file: tFileInfo): Promise<tFileID>;
+  updateFile(alias: string, file: tFileInfo): Promise<tFileID>;
   // images
   listImages(alias: string): Promise<tResourceInfo[]>;
+  hasImage(alias: string, imgName: string): Promise<boolean>;
+  deleteImage(alias: string, imgName: string): Promise<Response>;
+  createImage(alias: string, file: tImageInfo): Promise<tImageID>;
   // stories
   listStories(alias: string, fromPage?: number, toPage?: number): Promise<tStoryList[]>;
   getStory(alias: string, id: string): Promise<Response> | null;

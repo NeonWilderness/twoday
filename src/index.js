@@ -535,31 +535,27 @@ class Twoday {
       }
       return allItems;
     } catch (err) {
-      this.#handleError(`Error while getting the list of files list for "${alias}"`, err, cThrowAndExit);
+      this.#handleError(`Error while getting the list of ${resType} list for "${alias}"`, err, cThrowAndExit);
     }
   }
 
-  async listFiles(alias) {
-    return await this.listItems(alias, 'files');
-  }
-
-  async hasFile(alias, fileName) {
+  async hasItem(alias, resType, resName) {
     try {
       this.checkLoggedIn();
 
-      const fileUrl = `${this.getAliasDomain(alias)}/files/${fileName}`;
-      await this.got.get(fileUrl);
+      const resUrl = `${this.getAliasDomain(alias)}/${resType}/${resName}`;
+      await this.got.get(resUrl);
       return true;
     } catch (err) {
       return false;
     }
   }
 
-  async deleteFile(alias, fileName) {
+  async deleteItem(alias, resType, resName) {
     try {
       this.checkLoggedIn();
 
-      const deleteUrl = `${this.getAliasDomain(alias)}/files/${fileName}/delete`;
+      const deleteUrl = `${this.getAliasDomain(alias)}/${resType}/${resName}/delete`;
       let response = await this.got.get(deleteUrl);
 
       await this.delayNextPromise();
@@ -571,11 +567,23 @@ class Twoday {
         }
       });
       if (!this.silent)
-        console.log(`File "${alias}/${fileName}" successfully deleted (statusCode=${response.statusCode}).`);
+        console.log(`File "${alias}/${resName}" successfully deleted (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
-      this.#handleError(`Error while deleting file "${alias}/${fileName}"`, err, cThrowAndExit);
+      this.#handleError(`Error while deleting ${resType.slice(0, -1)} "${alias}/${resName}"`, err, cThrowAndExit);
     }
+  }
+
+  async listFiles(alias) {
+    return await this.listItems(alias, 'files');
+  }
+
+  async hasFile(alias, fileName) {
+    return await this.hasItem(alias, 'files', fileName);
+  }
+
+  async deleteFile(alias, fileName) {
+    return await this.deleteItem(alias, 'files', fileName);
   }
 
   async createFile(alias, file) {
@@ -598,7 +606,8 @@ class Twoday {
       });
       if (!this.silent)
         console.log(`File "${alias}/${file.name}" successfully created (statusCode=${response.statusCode}).`);
-      return response;
+      const $ = cheerio.load(response.body);
+      return $('td>b').eq(0).text();
     } catch (err) {
       this.#handleError(`Error while creating file "${alias}/${file.name}"`, err, cThrowAndExit);
     }
@@ -608,7 +617,7 @@ class Twoday {
     try {
       const fileExists = await this.hasFile(alias, file.name);
       if (fileExists) await this.deleteFile(alias, file.name);
-      await this.createFile(alias, file);
+      return await this.createFile(alias, file);
     } catch (err) {
       this.#handleError(`Error while updating file "${alias}/${file.name}"`, err, cThrowAndExit);
     }
@@ -616,6 +625,62 @@ class Twoday {
 
   async listImages(alias) {
     return await this.listItems(alias, 'images');
+  }
+
+  async hasImage(alias, imgName) {
+    return await this.hasItem(alias, 'images', imgName);
+  }
+
+  async deleteImage(alias, imgName) {
+    return await this.deleteItem(alias, 'images', imgName);
+  }
+
+  async createImage(alias, image) {
+    try {
+      this.checkLoggedIn();
+
+      const defaults = {
+        alias: '',
+        path: '',
+        url: '',
+        alttext: '',
+        addToTopic: '',
+        topic: '',
+        resizeto: 'no',
+        width: '400',
+        height: '400'
+      };
+      const param = Object.assign(defaults, image);
+      if (!param.path && !param.url) throw new Error('Image must have an image file path or an URL!');
+      const imgName = param.alias || (param.path || param.url).split('/').pop();
+
+      const createUrl = `${this.getAliasDomain(alias)}/images/create`;
+      let response = await this.got.get(createUrl);
+
+      await this.delayNextPromise();
+
+      const form = new FormData();
+      form.append('secretKey', this.#getSecretKey(response.body));
+      form.append('rawimage', param.path ? fs.createReadStream(param.path) : '');
+      form.append('url', param.url || '');
+      form.append('alias', param.alias);
+      form.append('alttext', param.alttext); // img description and img alt="..."
+      form.append('addToTopic', param.addToTopic);
+      form.append('topic', param.topic);
+      form.append('resizeto', param.resizeto);
+      form.append('width', param.width);
+      form.append('height', param.height);
+      form.append('save', 'Sichern');
+      response = await this.got.post(createUrl, {
+        body: form
+      });
+      if (!this.silent)
+        console.log(`File "${alias}/${imgName}" successfully created (statusCode=${response.statusCode}).`);
+      const $ = cheerio.load(response.body);
+      return $('td>b').eq(0).text();
+    } catch (err) {
+      this.#handleError(`Error while creating file "${alias}/${imgName}"`, err, cThrowAndExit);
+    }
   }
 
   getNiceUrl(url) {
@@ -866,9 +931,7 @@ class Twoday {
       const usedKB = Number(diskUsageNumbers[0]);
 
       const diskUsage =
-        diskUsageNumbers.length === 2
-          ? Math.round(usedKB / Number(diskUsageNumbers[1]) * 1000) / 10
-          : 0;
+        diskUsageNumbers.length === 2 ? Math.round((usedKB / Number(diskUsageNumbers[1])) * 1000) / 10 : 0;
 
       const trustedSite = diskUsage === 0;
 

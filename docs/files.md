@@ -49,7 +49,7 @@ console.log(`File mySuperSong does ${hasSong ? '' : 'not '}exist.`)
 <hr>
 
 ### Update a file
-#### .updateFile(alias: string, file: tFileInfo): Promise&lt;Response&gt;
+#### .updateFile(alias: string, file: tFileInfo): Promise&lt;tFileID&gt;
 
 Param | Type | Text
 --- | --- | --- 
@@ -63,7 +63,9 @@ path | string | the file's location
 description | string | a textual file description
 
 - requires: successful login
-- returns: http post response
+- returns: tFileID string
+
+> tFileID is the resulting name tag for the file, either defined by tFileInfo.name or derived by the system. If the same file name already exists, a new entry will be created and a sequential number will be added to tFileID (starting with "0").
 
 > If the file does not yet exist, it will be created.
 
@@ -73,16 +75,17 @@ const path = require('path');
 ...
 const td = new Twoday('prod');
 await td.login();
-await td.updateFile('neonwilderness', {
+const fileID = await td.updateFile('neonwilderness', {
   name: 'commentform-min',
   path: path.resolve(process.cwd(), 'src/commentform-min.js'),
   description: 'Improved commentform script'
 });
+console.log(`The name tag for this file is: ${fileID}.`);
 ```
 <hr>
 
 ### Create a file
-#### .createFile(alias: string, file: tFileInfo): Promise&lt;Response&gt;
+#### .createFile(alias: string, file: tFileInfo): Promise&lt;tFileID&gt;
 
 Param | Type | Text
 --- | --- | --- 
@@ -96,7 +99,9 @@ path | string | the file's location
 description | string | a textual file description
 
 - requires: successful login
-- returns: http post response
+- returns: tFileID string
+
+> tFileID is the resulting name tag for the file, either defined by tFileInfo.name or derived by the system. If the same file name already exists, a new entry will be created and a sequential number will be added to tFileID (starting with "0").
 
 > If the file does already exist, a copy will be created.
 
@@ -106,11 +111,12 @@ const path = require('path');
 ...
 const td = new Twoday('prod');
 await td.login();
-await td.createFile('neonwilderness', {
+const fileID = await td.createFile('neonwilderness', {
   name: 'version',
   path: path.resolve(process.cwd(), './version.json'),
   description: 'A JSON file that keeps the current script versions used on the blog.'
 });
+console.log(`The name tag for this file is: ${fileID}.`);
 ```
 <hr>
 
@@ -137,6 +143,8 @@ const file = {
   path: path.resolve(process.cwd(), './test123.js'),
   description: 'A test file that will quickly be deleted.'
 };
-await td.createFile(alias, file);
-await td.deleteFile(alias, file.name);
+const fileID = await td.createFile(alias, file);
+await td.deleteFile(alias, fileID);
 ```
+
+> You should not use *file.name* as a param to *td.deleteFile*, as the name tag may have been altered by the system (i.e. in case 'test123' already existed).
