@@ -7,6 +7,7 @@
 It helps you with
 - reading/creating/updating/deleting skins
 - listing/creating/updating/deleting files
+- listing/creating/updating/deleting images
 - listing/reading/creating/updating/deleting stories
 - managing available layouts (e.g. add a skin to a non-active layout) or download a zipped layout file
 - get general infos about a specific blog alias
@@ -25,13 +26,14 @@ For utilizing most of the API functions you will require a valid twoday.net User
 ## Definitions
 Term | Meaning
 --- | ---
+Platform | "prod" or "dev" whereas **prod** is the production (end-user) platform and **dev** is the development/playground space for platform maintainers.
 Alias | A blog alias is the name of a Twoday blog. Twoday blog urls are assembled as `https://{alias}.twoday.net`, e.g. in `https://neonwilderness.twoday.net`, "neonwilderness" is the blog alias.
 Administrator | Crucial API functions such as updating skins or deleting files of an alias require **Administrator** authorization. The blog owner/creator is always an Administrator but may also appoint additional users to the "Adminstrator" role. Hence, you can only manage aliases (blogs) for which your specific user has been authorized as Admin or if you are its owner.
-Skins | Twoday skins are template files which may contain HTML, CSS, JavaScript, partial layouts, data and comprise the basis of the blog's frontend. They often embed macros such as `<% username %>` which are resolved server-side before sent to the browser.
+Skins | Twoday skins are template files which may contain HTML, CSS, JavaScript, partial layouts, miscelleaneous data and comprise the basis of the blog's frontend. They often embed macros such as `<% username %>` which are resolved/replaced server-side before sent to the browser.
 Layouts | Each blog can have multiple layouts, yet only one of them is active and defines the look & feel of the blog. Layouts consist of a number of predefined (but editable) system skins or user defined skins.
 Files | An alias can hold and upload own files, e.g. PDF, documents, script files, all kinds of data files to embed them either in stories or skins.
+Images | An alias can store and upload images of different mime types which can then be used/embedded in stories with the `<% image name="..." %>` macro.
 Stories | The blog's articles with data items such as title, createDate, content (HTML).
-Platform | "prod" or "dev" whereas **prod** is the production (end-user) platform and **dev** is the development/playground space for platform maintainers.
 
 ## Documentation
 <hr>
@@ -95,6 +97,8 @@ await td.logout();
 - requires: successful login
 - returns: array of aliases
 
+> Blog owners (the creator of a blog) are also categorized as "Administrator".
+
 #### Example: Create prod instance, login, get all admin memberships
 ```
 const td = new Twoday('prod');
@@ -109,10 +113,10 @@ await td.logout();
 
 Please refer to the following sub-pages for topic related documentation:
 
-- [x] [Skins](./docs/skins.md) | Functions related to Twoday Skins
-- [x] [Stories](./docs/stories.md) | Functions related to Twoday Stories
-- [x] [Files](./docs/files.md) | Functions related to Twoday Files
-- [x] [Images](./docs/images.md) | Functions related to Twoday Images
-- [x] [Layouts](./docs/layouts.md) | Functions related to Twoday Layouts
-- [x] [Special](./docs/special.md) | Special purpose functions
-- [x] [Helper](./docs/helper.md) | Useful helper functions
+- [x] [Skins](./docs/skins.md) :: Functions related to Twoday Skins
+- [x] [Stories](./docs/stories.md) :: Functions related to Twoday Stories
+- [x] [Files](./docs/files.md) :: Functions related to Twoday Files
+- [x] [Images](./docs/images.md) :: Functions related to Twoday Images
+- [x] [Layouts](./docs/layouts.md) :: Functions related to Twoday Layouts
+- [x] [Special](./docs/special.md) :: Special purpose functions
+- [x] [Helper](./docs/helper.md) :: Useful helper functions

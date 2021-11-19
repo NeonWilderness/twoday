@@ -121,17 +121,19 @@ interface tAliasInfo {
 
 declare class Twoday {
   constructor(platform: tPlatform, userOptions?: tUserOptions);
-  checkLoggedIn(): void;
-  delayNextPromise(): Promise<void>;
+  #checkLoggedIn(): void;
   #getDomain(): string;
-  getAliasDomain(alias: string): string;
   #getSecretKey(data: string): string;
-  fixURL(url: string): string;
   login(): Promise<Response>;
   logout(): Promise<Response>;
+  getMemberships(): Promise<string[]>;
+  // helper
+  delayNextPromise(): Promise<void>;
+  fixURL(url: string): string;
+  getAliasDomain(alias: string): string;
   getValidHoptypes(): Promise<string[]>;
   isValidHoptype(skinName: string): Promise<tIsValidHoptype>;
-  getMemberships(): Promise<string[]>;
+  listItems(alias: string, resType:tResType): Promise<tResourceInfo[]>;
   // skins
   getModifiedSkins(alias: string): Promise<tNameUrl[]>;
   isModifiedSkin(alias: string, skinName: string): Promise<tIsModifiedSkin>;
@@ -143,8 +145,6 @@ declare class Twoday {
   updateSkin(alias: string, skinName: string, options: tSkinOptions): Promise<Response>;
   deleteSkin(alias: string, skinName: string): Promise<Response>;
   createSkin(alias: string, skinName: string, options?: tSkinOptions): Promise<Response>;
-  // helper
-  listItems(alias: string, resType:tResType): Promise<tResourceInfo[]>;
   // files
   listFiles(alias: string): Promise<tResourceInfo[]>;
   hasFile(alias: string, fileName: string): Promise<boolean>;

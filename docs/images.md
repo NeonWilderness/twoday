@@ -23,7 +23,7 @@ name | string | the image's name
 mime | string | the image's mime type 
 url | string | the image's url
 
-> This is a syntactic sugar function to the generic info provider function *listItems()*.
+> This is a syntactic sugar function to the generic info provider function *[listItems()](./docs/helper.md#get-a-list-of-files-or-images)*.
 
 #### Example: Log out all jpg images of blog alias 'neonwilderness'
 ```

@@ -12,7 +12,7 @@
 
 - returns: void
 
-> This delay function comes in handy in between of repetitive http calls to avoid hammering the server. The default waiting time is 20ms but can be modified by constructor option.
+> This delay function comes in handy in between of repetitive http calls to avoid hammering the server. The default waiting time is 20ms but may be modified by a constructor option.
 
 #### Example
 
@@ -115,4 +115,4 @@ name | string | the image's name
 mime | string | the image's mime type 
 url | string | the image's url
 
-> Please also check the related [listFiles()](/docs/files.md#get-a-list-of-files) and [listImages()](/docs/images.md#get-a-list-of-images) functions.
+> Please also check the related [listFiles()](./docs/files.md#get-a-list-of-files) and [listImages()](./docs/images.md#get-a-list-of-images) functions.

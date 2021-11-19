@@ -51,7 +51,7 @@ class Twoday {
     if (!this.silent) console.log(`Twoday v${this.version} on ${this.platform}.`);
   }
 
-  checkLoggedIn() {
+  #checkLoggedIn() {
     try {
       const cookies = this.cookieJar.serializeSync().cookies;
       return cookies[2].key === 'avLoggedIn' && cookies[2].value === '1';
@@ -166,7 +166,7 @@ class Twoday {
 
   async getMemberships() {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const response = await this.got.get('members/memberships', {
         prefixUrl: this.baseUrl
@@ -199,7 +199,7 @@ class Twoday {
 
   async getModifiedSkins(alias) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const prefixUrl = await this.getActiveLayoutUrl(alias);
       const response = await this.got.get('skins/modified', { prefixUrl });
@@ -238,7 +238,7 @@ class Twoday {
   }
 
   async #getLayoutData(alias) {
-    this.checkLoggedIn();
+    this.#checkLoggedIn();
 
     const response = await this.got.get('layouts/main', {
       prefixUrl: `${this.getAliasDomain(alias)}`
@@ -304,7 +304,7 @@ class Twoday {
 
   async getSkin(skin) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       skin.url = this.fixURL(skin.url);
       const response = await this.got.get(skin.url);
@@ -328,7 +328,7 @@ class Twoday {
 
   async postSkin(skin) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const data = Object.assign({}, skin);
       delete data.name;
@@ -443,7 +443,7 @@ class Twoday {
 
   async deleteSkin(alias, skinName) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const { isModified, prototype, name } = await this.isModifiedSkin(alias, skinName);
       if (!isModified) throw new Error('Skin is not a modified/deletable skin!');
@@ -514,7 +514,7 @@ class Twoday {
         .get();
 
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
       if (!['files', 'images'].includes(resType)) throw new Error('Param "resType" must be "files" or "images".');
 
       const resUrl = `${this.getAliasDomain(alias)}/${resType}/?page=`;
@@ -542,7 +542,7 @@ class Twoday {
 
   async hasItem(alias, resType, resName) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const resUrl = `${this.getAliasDomain(alias)}/${resType}/${resName}`;
       await this.got.get(resUrl);
@@ -554,7 +554,7 @@ class Twoday {
 
   async deleteItem(alias, resType, resName) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const deleteUrl = `${this.getAliasDomain(alias)}/${resType}/${resName}/delete`;
       let response = await this.got.get(deleteUrl);
@@ -589,7 +589,7 @@ class Twoday {
 
   async createFile(alias, file) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const createUrl = `${this.getAliasDomain(alias)}/files/create`;
       let response = await this.got.get(createUrl);
@@ -638,7 +638,7 @@ class Twoday {
 
   async createImage(alias, image) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const defaults = {
         alias: '',
@@ -686,7 +686,7 @@ class Twoday {
 
   async updateImage(alias, image) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const defaults = {
         alias: '',
@@ -808,7 +808,7 @@ class Twoday {
 
   async createStory(alias, story) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       this.#validateStory(story);
 
@@ -860,7 +860,7 @@ class Twoday {
 
   async updateStory(alias, story) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       this.#validateStory(story);
 
@@ -916,7 +916,7 @@ class Twoday {
 
   async downloadLayout(alias, layout) {
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const downloadUrl = `${this.getAliasDomain(alias)}/layouts/${layout.name}/download`;
       let response = await this.got.get(downloadUrl);
@@ -958,7 +958,7 @@ class Twoday {
       en: { m: /created by (.*)/, s: ' on ' }
     };
     try {
-      this.checkLoggedIn();
+      this.#checkLoggedIn();
 
       const response = await this.got.get(`${this.getAliasDomain(alias)}/manage`);
       const $ = cheerio.load(response.body);
