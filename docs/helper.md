@@ -50,7 +50,7 @@ url | string | an abitrary (Twoday) URL
 #### Example
 ```
 const td = new Twoday('prod');
-const url = td.fixUrl('//static.twoday.net');
+const url = td.fixURL('//static.twoday.net');
 console.log(url); // https://static.twoday.net
 ```
 <hr>
@@ -115,4 +115,4 @@ name | string | the image's name
 mime | string | the image's mime type 
 url | string | the image's url
 
-> Please also check the related listFiles() and listImages() functions.
+> Please also check the related [listFiles()](/docs/files.md#get-a-list-of-files) and [listImages()](/docs/images.md#get-a-list-of-images) functions.

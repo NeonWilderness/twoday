@@ -515,6 +515,7 @@ class Twoday {
 
     try {
       this.checkLoggedIn();
+      if (!['files', 'images'].includes(resType)) throw new Error('Param "resType" must be "files" or "images".');
 
       const resUrl = `${this.getAliasDomain(alias)}/${resType}/?page=`;
 
@@ -535,7 +536,7 @@ class Twoday {
       }
       return allItems;
     } catch (err) {
-      this.#handleError(`Error while getting the list of ${resType} list for "${alias}"`, err, cThrowAndExit);
+      this.#handleError(`Error while getting the list of "${resType}" for "${alias}"`, err, cThrowAndExit);
     }
   }
 

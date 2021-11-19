@@ -110,8 +110,9 @@ await td.logout();
 Please refer to the following sub-pages for topic related documentation:
 
 - [x] [Skins](./docs/skins.md) | Functions related to Twoday Skins
-- [x] [Files](./docs/files.md) | Functions related to Twoday Files
 - [x] [Stories](./docs/stories.md) | Functions related to Twoday Stories
+- [x] [Files](./docs/files.md) | Functions related to Twoday Files
+- [x] [Images](./docs/images.md) | Functions related to Twoday Images
 - [x] [Layouts](./docs/layouts.md) | Functions related to Twoday Layouts
 - [x] [Special](./docs/special.md) | Special purpose functions
 - [x] [Helper](./docs/helper.md) | Useful helper functions
