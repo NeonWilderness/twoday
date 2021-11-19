@@ -651,7 +651,7 @@ class Twoday {
         height: '400'
       };
       const param = Object.assign(defaults, image);
-      if (!param.path && !param.url) throw new Error('Image must have an image file path or an URL!');
+      if (!param.path && !param.url) throw new Error('New image must have an image file path or an URL!');
       const imgName = param.alias || (param.path || param.url).split('/').pop();
 
       const createUrl = `${this.getAliasDomain(alias)}/images/create`;
@@ -680,6 +680,50 @@ class Twoday {
       return $('td>b').eq(0).text();
     } catch (err) {
       this.#handleError(`Error while creating file "${alias}/${imgName}"`, err, cThrowAndExit);
+    }
+  }
+
+  async updateImage(alias, image) {
+    try {
+      this.checkLoggedIn();
+
+      const defaults = {
+        alias: '',
+        path: '',
+        url: '',
+        resizeto: 'no',
+        width: '400',
+        height: '400'
+      };
+      const param = Object.assign(defaults, image);
+      const imgAlias = param.alias || '';
+      delete param.alias;
+
+      if (!imgAlias) throw new Error('Image alias is missing!');
+      if (!param.path && !param.url) throw new Error('Replacing image must have an image file path or an URL!');
+
+      const replaceUrl = `${this.getAliasDomain(alias)}/images/${imgAlias}/replace`;
+      let response = await this.got.get(replaceUrl);
+
+      await this.delayNextPromise();
+
+      const form = new FormData();
+      form.append('secretKey', this.#getSecretKey(response.body));
+      form.append('rawimage', param.path ? fs.createReadStream(param.path) : '');
+      form.append('url', param.url || '');
+      form.append('resizeto', param.resizeto);
+      form.append('width', param.width);
+      form.append('height', param.height);
+      form.append('save', 'Sichern');
+      response = await this.got.post(replaceUrl, {
+        body: form
+      });
+      if (!this.silent)
+        console.log(`Image "${alias}/${imgAlias}" successfully replaced (statusCode=${response.statusCode}).`);
+      const $ = cheerio.load(response.body);
+      return $('td>b').eq(0).text();
+    } catch (err) {
+      this.#handleError(`Error while replacing image "${alias}/${imgAlias}"`, err, cThrowAndExit);
     }
   }
 

@@ -8,23 +8,31 @@
 <hr>
 
 ### Get a list of files
-#### .listFiles(alias: string) : Promise&lt;string[]&gt;
+#### .listFiles(alias: string) : Promise&lt;tResourceInfo[]&gt;
 
 Param | Type | Text
 --- | --- | --- 
 alias | string | a blog's alias
 
 - requires: successful login
-- returns: array of string (filename)
+- returns: array of tResourceInfo
+
+tResourceInfo Property | Type | Text
+--- | --- | --- 
+name | string | the file's name
+mime | string | the file's mime type 
+url | string | the file's url
+
+> This is a syntactic sugar function to the generic info provider function *listItems()*.
 
 #### Example: Log out all files of blog alias 'mmm'
 ```
 const td = new Twoday('prod');
 await td.login();
 const alias = 'mmm';
-const files = await td.listFiles(alias);
+const resInfos = await td.listFiles(alias);
 console.log(`Blog "${alias}" features the following files:`);
-files.forEach(fileName => console.log(fileName));
+resInfos.forEach(file => console.log(file.name));
 ```
 <hr>
 
@@ -65,8 +73,6 @@ description | string | a textual file description
 - requires: successful login
 - returns: tFileID string
 
-> tFileID is the resulting name tag for the file, either defined by tFileInfo.name or derived by the system. If the same file name already exists, a new entry will be created and a sequential number will be added to tFileID (starting with "0").
-
 > If the file does not yet exist, it will be created.
 
 #### Example: Update a minified JavaScript file *commentform-min* on blog alias *neonwilderness*
@@ -101,7 +107,7 @@ description | string | a textual file description
 - requires: successful login
 - returns: tFileID string
 
-> tFileID is the resulting name tag for the file, either defined by tFileInfo.name or derived by the system. If the same file name already exists, a new entry will be created and a sequential number will be added to tFileID (starting with "0").
+> tFileID is the resulting name tag for the file, either defined by tFileInfo.name or derived by the system. If the same file name already exists, a new entry will be created and a sequential number will be added to tFileID (starting with "0"). It is strongly recommended to always check/use the returned tFileID as this may differ from the originally intended file name.
 
 > If the file does already exist, a copy will be created.
 

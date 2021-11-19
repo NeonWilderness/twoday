@@ -155,7 +155,8 @@ declare class Twoday {
   listImages(alias: string): Promise<tResourceInfo[]>;
   hasImage(alias: string, imgName: string): Promise<boolean>;
   deleteImage(alias: string, imgName: string): Promise<Response>;
-  createImage(alias: string, file: tImageInfo): Promise<tImageID>;
+  createImage(alias: string, image: tImageInfo): Promise<tImageID>;
+  updateImage(alias: string, image: tImageInfo): Promise<tImageID>;
   // stories
   listStories(alias: string, fromPage?: number, toPage?: number): Promise<tStoryList[]>;
   getStory(alias: string, id: string): Promise<Response> | null;

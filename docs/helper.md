@@ -96,3 +96,23 @@ Results in:
   name: 'display
 }
 ```
+<hr>
+
+### Get a list of files or images
+#### .listItems(alias: string, resType: tResType) : Promise&lt;tResourceInfo[]&gt;
+
+Param | Type | Text
+--- | --- | --- 
+alias | string | a blog's alias
+resType | tResType | resource type: 'files' or 'images'
+
+- requires: successful login
+- returns: array of tResourceInfo
+
+tResourceInfo Property | Type | Text
+--- | --- | --- 
+name | string | the image's name
+mime | string | the image's mime type 
+url | string | the image's url
+
+> Please also check the related listFiles() and listImages() functions.
