@@ -115,4 +115,4 @@ name | string | the image's name
 mime | string | the image's mime type 
 url | string | the image's url
 
-> Please also check the related [listFiles()](./docs/files.md#get-a-list-of-files) and [listImages()](./docs/images.md#get-a-list-of-images) functions.
+> Please also check the related [listFiles()](./docs/files.md#get-a-list-of-files) and [listImages()](./docs/images.md#get-a-list-of-images) functions. Both methods internally call *listItems()*.

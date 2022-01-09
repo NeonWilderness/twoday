@@ -99,6 +99,8 @@ await td.logout();
 
 > Blog owners (the creator of a blog) are also categorized as "Administrator".
 
+> The user's authorization to access/modify a specific blog alias is always checked on the server side. To avoid authorization errors it hence makes sense to verify if the desired blog alias is included in the *getMemberships* response.
+
 #### Example: Create prod instance, login, get all admin memberships
 ```
 const td = new Twoday('prod');

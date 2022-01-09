@@ -1,29 +1,29 @@
-type tPlatform = 'dev' | 'prod';
-type tResType = 'files' | 'images';
+export type tPlatform = 'dev' | 'prod';
+export type tResType = 'files' | 'images';
 
-interface tUserOptions {
+export interface tUserOptions {
   delay?: number;
   agreedVersion?: string;
   silent?: boolean;
 }
-interface tIsValidHoptype {
+export interface tIsValidHoptype {
   valid: boolean;
   prototype: string;
   name: string;
 }
-interface tIsModifiedSkin extends tIsValidHoptype {
+export interface tIsModifiedSkin extends tIsValidHoptype {
   isModified: boolean;
   url: string;
 }
-interface tNameUrl {
+export interface tNameUrl {
   name: string;
   url: string;
 }
-interface tSkin {
+export interface tSkin {
   name: string;
   url: string;
 }
-interface tSkinEnriched extends tSkin {
+export interface tSkinEnriched extends tSkin {
   secretKey: string;
   action: string;
   key: string;
@@ -34,36 +34,36 @@ interface tSkinEnriched extends tSkin {
   skin: string;
   save: string;
 }
-interface tSkinOptions {
+export interface tSkinOptions {
   title?: string;
   description?: string;
   skin?: string;
   diff?: boolean;
 }
-interface tDiffResult {
+export interface tDiffResult {
   itemChanged: boolean;
   header: string;
   text: string;
   diffs: string;
 }
-interface tDiffResults {
+export interface tDiffResults {
   skinChanged: boolean;
   results: tDiffResult[];
 }
-interface tResourceInfo {
+export interface tResourceInfo {
   name: string;
   mime: string;
   url: string;
 }
-type tFileID = string;
-interface tFileInfo {
+export type tFileID = string;
+export interface tFileInfo {
   name: string;
   path: string;
   description: string;
 }
-type tImageID = string;
-type tResizeTo = 'max' | 'crop' | 'scale' | 'exact' | 'no';
-interface tImageInfo {
+export type tImageID = string;
+export type tResizeTo = 'max' | 'crop' | 'scale' | 'exact' | 'no';
+export interface tImageInfo {
   alias?: string;
   path?: string;
   url?: string;
@@ -74,18 +74,18 @@ interface tImageInfo {
   width?: string;
   height?: string;
 }
-interface tLayoutInfo {
+export interface tLayoutInfo {
   name: string;
   path: string;
 }
-interface tLayoutData {
+export interface tLayoutData {
   activeLayoutUrl: string;
   activeLayoutName: string;
   layoutNames: string[];
 }
-type tStoryID = string | number;
-type tStoryAction = 'save' | 'publish';
-interface tStoryInfo {
+export type tStoryID = string | number;
+export type tStoryAction = 'save' | 'publish';
+export interface tStoryInfo {
   title: string;
   body: string;
   id?: tStoryID;
@@ -94,32 +94,32 @@ interface tStoryInfo {
   publish?: string;
   action?: tStoryAction;
 }
-interface tStoryListItem {
+export interface tStoryListItem {
   id: string;
   createDate: string;
   title: string;
 }
-interface tStoryList {
+export interface tStoryList {
   fromPage: number;
   toPage: number;
   maxPage: number;
   stories: tStoryListItem[];
   total: number;
 }
-type tAlienVersion = string | 'N/A';
-interface tAliasInfo {
-  creator: string,
-  createDate: string,
-  stories: number,
-  comments: number,
-  images: number,
-  files: number,
-  diskUsage: number,
-  usedKB: number,
-  trustedSite: boolean
+export type tAlienVersion = string | 'N/A';
+export interface tAliasInfo {
+  creator: string;
+  createDate: string;
+  stories: number;
+  comments: number;
+  images: number;
+  files: number;
+  diskUsage: number;
+  usedKB: number;
+  trustedSite: boolean;
 }
 
-declare class Twoday {
+export declare class Twoday {
   constructor(platform: tPlatform, userOptions?: tUserOptions);
   #checkLoggedIn(): void;
   #getDomain(): string;
@@ -133,7 +133,7 @@ declare class Twoday {
   getAliasDomain(alias: string): string;
   getValidHoptypes(): Promise<string[]>;
   isValidHoptype(skinName: string): Promise<tIsValidHoptype>;
-  listItems(alias: string, resType:tResType): Promise<tResourceInfo[]>;
+  listItems(alias: string, resType: tResType): Promise<tResourceInfo[]>;
   // skins
   getModifiedSkins(alias: string): Promise<tNameUrl[]>;
   isModifiedSkin(alias: string, skinName: string): Promise<tIsModifiedSkin>;
