@@ -8,8 +8,8 @@ describe('Can instantiate a valid Twoday class', () => {
     expect(td.platform).toBe('prod');
     expect(td.fullDomain).toBe('twoday.net');
     expect(td.baseUrl).toBe('https://twoday.net');
-    expect(typeof td.layoutUrl).toBe('object');
-    expect(Object.keys(td.layoutUrl)).toHaveLength(0);
+    expect(typeof td.layout).toBe('object');
+    expect(Object.keys(td.layout)).toHaveLength(0);
     expect(td.delay).toBe(20);
     expect(td.silent).toBeFalsy();
     const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
@@ -22,16 +22,16 @@ describe('Can instantiate a valid Twoday class', () => {
   it('should work with platform=dev', () => {
     const td = new Twoday('dev', { silent: true });
     expect(td.platform).toBe('dev');
-    expect(td.fullDomain).toBe('twoday.xyz');
-    expect(td.baseUrl).toBe('https://twoday.xyz');
-    expect(typeof td.layoutUrl).toBe('object');
-    expect(Object.keys(td.layoutUrl)).toHaveLength(0);
+    expect(td.fullDomain).toBe('twoday-test.click');
+    expect(td.baseUrl).toBe('https://twoday-test.click');
+    expect(typeof td.layout).toBe('object');
+    expect(Object.keys(td.layout)).toHaveLength(0);
     expect(td.delay).toBe(20);
     expect(td.silent).toBeTruthy();
     const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
     expect(c.key).toBe('agreed');
     expect(c.value).toBe('20190210a');
-    expect(c.domain).toBe('twoday.xyz');
+    expect(c.domain).toBe('twoday-test.click');
     expect(c.secure).toBeTruthy();
   });
 
@@ -42,15 +42,15 @@ describe('Can instantiate a valid Twoday class', () => {
   it('should consider platform=dev, delay=40, agreed=20210517b', () => {
     const td = new Twoday('dev', { delay: 40, agreedVersion: '20210517b', silent: true });
     expect(td.platform).toBe('dev');
-    expect(td.fullDomain).toBe('twoday.xyz');
-    expect(typeof td.layoutUrl).toBe('object');
-    expect(Object.keys(td.layoutUrl)).toHaveLength(0);
+    expect(td.fullDomain).toBe('twoday-test.click');
+    expect(typeof td.layout).toBe('object');
+    expect(Object.keys(td.layout)).toHaveLength(0);
     expect(td.delay).toBe(40);
     expect(td.silent).toBeTruthy();
     const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
     expect(c.key).toBe('agreed');
     expect(c.value).toBe('20210517b');
-    expect(c.domain).toBe('twoday.xyz');
+    expect(c.domain).toBe('twoday-test.click');
     expect(c.secure).toBeTruthy();
   });
 
@@ -62,8 +62,8 @@ describe('Can instantiate a valid Twoday class', () => {
 
   it('should get proper DEV alias domains', () => {
     const td = new Twoday('dev', { silent: true });
-    expect(td.getAliasDomain('neonwilderness')).toBe('https://neonwilderness.twoday.xyz');
-    expect(td.getAliasDomain('info')).toBe('https://info.twoday.xyz');
+    expect(td.getAliasDomain('neonwilderness')).toBe('https://neonwilderness.twoday-test.click');
+    expect(td.getAliasDomain('info')).toBe('https://info.twoday-test.click');
     expect(() => td.getAliasDomain('')).toThrow();
     expect(() => td.getAliasDomain()).toThrow();
   });
@@ -80,24 +80,28 @@ describe('Can instantiate a valid Twoday class', () => {
     const td = new Twoday('prod', { silent: true });
     const alias = 'neonwilderness';
     const wantedUrl = 'https://neonwilderness.twoday.net/layouts/rainy';
-    return td.login()
-      .then(() => td.getLayoutUrl(alias))
-      .then(url => {
-        expect(url.length).toBeTruthy();
-        expect(url).toBe(wantedUrl);
-        expect(Object.keys(td.layoutUrl)).toHaveLength(1);
-        expect(alias in td.layoutUrl).toBeTruthy();
-        expect(td.layoutUrl[alias]).toBe(wantedUrl);
-      })
+    return td
+      .login()
+      .then(() => td.getLayout(alias))
+      .then(({ activeLayoutUrl, activeLayoutName, layoutNames }) => {
+        expect(activeLayoutUrl.length).toBeTruthy();
+        expect(activeLayoutUrl).toBe(wantedUrl);
+        expect(activeLayoutName.length).toBeTruthy();
+        expect(activeLayoutName).toBe('rainy');
+        expect(layoutNames.length).toBeGreaterThan(0);
+        expect(Object.keys(td.layout)).toHaveLength(1);
+        expect(alias in td.layout).toBeTruthy();
+      });
   });
 
   it('should return the owner/admin memberships', () => {
     const td = new Twoday('prod', { silent: true });
-    return td.login()
+    return td
+      .login()
       .then(() => td.getMemberships())
       .then(adminBlogs => {
         expect(Array.isArray(adminBlogs)).toBeTruthy();
         expect(adminBlogs.length).toBeGreaterThan(0);
-      })
+      });
   });
 });

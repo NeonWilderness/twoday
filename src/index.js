@@ -29,7 +29,7 @@ class Twoday {
     assert.ok(typeof options.silent === 'boolean', new Error('User option "silent" must be a boolean!'));
 
     this.platform = platform.toLowerCase(); // dev | prod
-    this.fullDomain = `twoday.${this.#getDomain()}`;
+    this.fullDomain = `twoday${this.#getDomain()}`;
     this.baseUrl = `https://${this.fullDomain}`;
     this.layout = {};
     this.delay = Math.abs(options.delay); // ms
@@ -67,9 +67,9 @@ class Twoday {
   #getDomain() {
     switch (this.platform) {
       case 'dev':
-        return 'xyz';
+        return '-test.click';
       case 'prod':
-        return 'net';
+        return '.net';
       default:
         this.#handleError(`Unknown platform code: "${this.platform}". Must be "dev" or "prod"!`);
     }

@@ -3,7 +3,7 @@ const Twoday = require('../src/index.js');
 const td = new Twoday('prod', { silent: true });
 describe('Can diff skins', () => {
   it('should throw an error upon wrong fields in skin param', () => {
-    expect(() => td.diffSkin('Site.anything', { desc: ''}, {})).toThrow();
+    expect(() => td.diffSkin('Site.anything', { desc: '' }, {})).toThrow();
   });
 
   it('should diff title/description', () => {
