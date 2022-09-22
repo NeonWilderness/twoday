@@ -39,21 +39,19 @@ describe('Can work with Twoday layouts', () => {
   });
 
   it('should throw when layout name is missing', async () => {
-    try {
-      await td.login();
-      await td.useLayout(alias);
-    } catch (e) {
-      expect(e.message).toMatch(/Missing layout name/);
-    }
+    await td.login();
+    const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+    await td.useLayout(alias);
+    expect(mockExit).toHaveBeenCalledWith(1);
+    mockExit.mockRestore();
   });
 
   it('should throw when layout name does not exist', async () => {
-    try {
-      await td.login();
-      await td.useLayout(alias, 'unkownLayoutName');
-    } catch (e) {
-      expect(e.message).toMatch(/does not exist/);
-    }
+    await td.login();
+    const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+    await td.useLayout(alias, 'unkownLayoutName');
+    expect(mockExit).toHaveBeenCalledWith(1);
+    mockExit.mockRestore();
   });
 
   it('should retain a changed layout name', async () => {
@@ -71,7 +69,7 @@ describe('Can work with Twoday layouts', () => {
 
     const layoutUsed = await td.useLayout(alias, 'alien');
     expect(layoutUsed.activeLayoutName).toBe('alien');
-    
+
     const layoutRefreshed = await td.getLayout(alias, true);
     expect(layoutRefreshed.activeLayoutName).toBe('twoday30');
   });

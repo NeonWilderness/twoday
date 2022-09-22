@@ -997,4 +997,4 @@ class Twoday {
   }
 }
 
-module.exports = Twoday;
+exports.Twoday = Twoday;
