@@ -39,7 +39,7 @@ Stories | The blog's articles with data items such as title, createDate, content
 <hr>
 
 ### Class Constructor
-#### new Twoday(platform: string, options: object)
+#### new Twoday.Twoday(platform: string, options: object)
 
 Param | Type | Value/s
 --- | --- | ---
@@ -58,7 +58,7 @@ silent? | boolean | false | Suppress console messages
 #### Example: Create a prod instance / no output messages
 ```
 const Twoday = require('@neonwilderness/twoday');
-const td = new Twoday('prod', { silent: true });
+const td = new Twoday.Twoday('prod', { silent: true });
 ```
 <hr>
 
@@ -69,7 +69,7 @@ const td = new Twoday('prod', { silent: true });
 
 #### Example: Create a prod instance with a general 50ms delay and login
 ```
-const td = new Twoday('prod', { delay: 50 });
+const td = new Twoday.Twoday('prod', { delay: 50 });
 await td.login();
 ```
 <hr>
@@ -81,7 +81,7 @@ await td.login();
 
 #### Example: Create a prod instance, login, get infos about an alias, then logout
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'neonwilderness';
 const { stories } = await td.getInfos(alias);
@@ -103,7 +103,7 @@ await td.logout();
 
 #### Example: Create prod instance, login, get all admin memberships
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const adminBlogs = await td.getMemberships();
 console.log(`My user has ${adminBlogs.length} admin auths.`);

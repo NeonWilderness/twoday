@@ -27,7 +27,7 @@ url | string | the image's url
 
 #### Example: Log out all jpg images of blog alias 'neonwilderness'
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'neonwilderness';
 const resInfos = await td.listImages(alias);
@@ -49,7 +49,7 @@ imgName | string | a file name
 
 #### Example: Check if image mySelfie exists on the neonwilderness blog
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const hasSelfie = await td.hasImage('neonwilderness', 'mySelfie');
 console.log(`File mySelfie does ${hasSelfie ? '' : 'not '}exist.`)
@@ -82,7 +82,7 @@ height? | string | target height (used if resizeto !== 'no')
 ```
 const path = require('path');
 ...
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const data = { 
   alias: 'baum1',
@@ -129,7 +129,7 @@ height? | string | target height (used if resizeto !== 'no')
 ```
 const path = require('path');
 ...
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const data = { 
   alias: 'baum2',
@@ -156,7 +156,7 @@ imgName | string | an image name/alias
 ```
 const path = require('path');
 ...
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'neonwilderness';
 await td.deleteImage(alias, 'baum3');

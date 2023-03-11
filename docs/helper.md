@@ -30,7 +30,7 @@ alias | string | the blog's alias
 
 #### Example
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 const url = td.getAliasDomain('neonwilderness');
 console.log(url); // https://neonwilderness.twoday.net
 ```
@@ -49,7 +49,7 @@ url | string | an abitrary (Twoday) URL
 
 #### Example
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 const url = td.fixURL('//static.twoday.net');
 console.log(url); // https://static.twoday.net
 ```
@@ -64,7 +64,7 @@ console.log(url); // https://static.twoday.net
 
 #### Example
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 const hops = await td.getValidHoptypes();
 console.log(hops); // [bloggerapi, choice, comment, day, file, ... , topicmgr, user, vote]
 ```
@@ -83,7 +83,7 @@ name | string | name part of skinName, e.g. *page*
 
 #### Example
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 const result = await td.isValidHoptype('hopsy.display');
 console.log(result);
 ```

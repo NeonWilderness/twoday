@@ -28,7 +28,7 @@ url | string | url of the skin
 
 #### Example: Create prod instance and log the list of modified skins of the 'mmm' blog
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const modSkins = await td.getModifiedSkins('mmm');
 console.log('The following skins were modified:');
@@ -58,7 +58,7 @@ url | string | url of the skin
 
 #### Example: Check if skin Site.page from the neonwilderness blog has been modified
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const s = await td.isModifiedSkin('neonwilderness', 'site.page');
 console.log(`Skin ${s.prototype}.${s.name} is ${s.isModified ? '' : 'not '}modified.`)
@@ -95,7 +95,7 @@ save | string | save
 
 #### Example: Check if skin Story.display from the neonwilderness blog has been modified, then read it and log the skin's content
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'neonwilderness';
 const skinName = 'story.display';
@@ -129,7 +129,7 @@ save | string | save
 
 #### Example: Get a skin and post it with a new title
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'neonwilderness';
 const skinName = 'story.display';
@@ -163,7 +163,7 @@ diff? | boolean | true=log old/new differences
 
 #### Example: Update the title of skin *Site.style* of blog alias *neonwilderness*
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 await td.updateSkin('neonwilderness', 'Site.style', {
   title: 'My special blog CSS'
@@ -193,7 +193,7 @@ skin? | string | a skin's new content
 
 #### Example: Update the title of skin *Site.style* of blog alias *neonwilderness*
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 await td.createSkin('neonwilderness', 'Site.myNewSkin', {
   title: 'This is my new skin with a "Hello World" DIV',
@@ -217,7 +217,7 @@ skinName | string | the skin's qualifier, e.g. *Site.obsolete*
 
 #### Example: Delete skin *Site.obsolete* of blog alias *neonwilderness*
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 await td.deleteSkin('neonwilderness', 'Site.obsolete');
 ```

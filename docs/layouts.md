@@ -26,7 +26,7 @@ layoutNames | string[] | the names of all available layouts for this blog
 
 #### Example: Switch to the alien layout of blog 'mmm' and log its URL
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const data = await td.useLayout('mmm', 'alien');
 console.log(`This alien layout's URL is "${data.activeLayoutUrl}"`);
@@ -52,7 +52,7 @@ layoutNames | string[] | the names of all available layouts for this blog
 
 #### Example: Log the active layout name of blog 'neonwilderness'
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const data = await td.getLayout('neonwilderness');
 console.log(`Neon's active layout name is "${data.activeLayoutName}"`);
@@ -73,7 +73,7 @@ alias | string | a blog's alias
 
 #### Example: Log the active layout url of blog 'neonwilderness'
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const url = await td.getActiveLayoutUrl('neonwilderness');
 console.log(`Neon's active layout url is "${url}"`);
@@ -94,7 +94,7 @@ alias | string | a blog's alias
 
 #### Example: Log the active layout name of blog 'neonwilderness'
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const name = await td.getActiveLayoutName('neonwilderness');
 console.log(`Neon's active layout name is "${name}"`);
@@ -115,7 +115,7 @@ alias | string | a blog's alias
 
 #### Example: Log all layout names of blog 'neonwilderness'
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'neonwilderness';
 const layouts = await td.getLayoutNames(alias);
@@ -145,7 +145,7 @@ path | string | local path/location to store the target layout zip file
 ```
 const path = require('path');
 ...
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'mmm';
 const layout = 'alien';

@@ -3,7 +3,7 @@ const Twoday = require('../src/index');
 require('dotenv-safe').config();
 
 jest.setTimeout(10000);
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 const alias = 'foundation';
 
 describe('Can work with Twoday stories', () => {

@@ -47,7 +47,7 @@ trustedSite | boolean | true=this blog is classified as a trusted site
 
 #### Example: Get basic infos about the neonwilderness blog
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const infos = await td.getInfos('neonwilderness');
 console.log(infos);

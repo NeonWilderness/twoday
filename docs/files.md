@@ -27,7 +27,7 @@ url | string | the file's url
 
 #### Example: Log out all files of blog alias 'mmm'
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'mmm';
 const resInfos = await td.listFiles(alias);
@@ -49,7 +49,7 @@ fileName | string | a file name
 
 #### Example: Check if file mySuperSong exists on the neonwilderness blog
 ```
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const hasSong = await td.hasFile('neonwilderness', 'mySuperSong');
 console.log(`File mySuperSong does ${hasSong ? '' : 'not '}exist.`)
@@ -79,7 +79,7 @@ description | string | a textual file description
 ```
 const path = require('path');
 ...
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const fileID = await td.updateFile('neonwilderness', {
   name: 'commentform-min',
@@ -115,7 +115,7 @@ description | string | a textual file description
 ```
 const path = require('path');
 ...
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const fileID = await td.createFile('neonwilderness', {
   name: 'version',
@@ -141,7 +141,7 @@ fileName | string | a file name
 ```
 const path = require('path');
 ...
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'neonwilderness';
 const file = {

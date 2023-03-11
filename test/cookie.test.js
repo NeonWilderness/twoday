@@ -4,7 +4,7 @@ jest.setTimeout(10000);
 
 describe('Can login and receive/store all necessary cookies', () => {
   it('should login to dev and get/store the relevant cookies', () => {
-    const td = new Twoday('dev', { silent: true });
+    const td = new Twoday.Twoday('dev', { silent: true });
     return td
       .login()
       .then(() => td.cookieJar.getCookiesSync(td.baseUrl))
@@ -21,7 +21,7 @@ describe('Can login and receive/store all necessary cookies', () => {
   });
 
   it('should login to prod and get/store the relevant cookies', () => {
-    const td = new Twoday('prod', { silent: true });
+    const td = new Twoday.Twoday('prod', { silent: true });
     return td
       .login()
       .then(() => td.cookieJar.getCookiesSync(td.baseUrl))

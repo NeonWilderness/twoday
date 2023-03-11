@@ -3,7 +3,7 @@ const Twoday = require('../src/index');
 require('dotenv-safe').config();
 
 jest.setTimeout(10000);
-const td = new Twoday('prod');
+const td = new Twoday.Twoday('prod');
 const alias = 'foundation';
 const rnd = Math.floor(Math.random() * 99);
 const imgName = `testimg${rnd.toString().padStart(2, '0')}`;

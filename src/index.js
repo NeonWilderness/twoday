@@ -64,6 +64,11 @@ class Twoday {
     return new Promise(resolve => setTimeout(resolve, this.delay));
   }
 
+  async delayed(gotPromise) {
+    const result = await Promise.all([gotPromise, this.delayNextPromise()]);
+    return result[0];
+  }
+
   #getDomain() {
     switch (this.platform) {
       case 'dev':
@@ -104,9 +109,9 @@ class Twoday {
         this.#handleError('Missing Twoday credentials in process.env.USER/PASSWORD', null, cThrowAndExit);
 
       const loginUrl = `${this.baseUrl}/members/login`;
-      let response = await this.got.get(loginUrl);
+      let response = await this.delayed(this.got.get(loginUrl));
 
-      response = await this.got.post(loginUrl, {
+      response = await this.delayed(this.got.post(loginUrl, {
         form: {
           secretKey: this.#getSecretKey(response.body),
           popup: '',
@@ -117,7 +122,7 @@ class Twoday {
           remember: 1,
           login: 'Anmelden'
         }
-      });
+      }));
 
       if (!this.silent) console.log(`Login to ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
       return response;
@@ -128,9 +133,9 @@ class Twoday {
 
   async logout() {
     try {
-      const response = await this.got.get('members/logout', {
+      const response = await this.delayed(this.got.get('members/logout', {
         prefixUrl: this.baseUrl
-      });
+      }));
 
       if (!this.silent) console.log(`Logout of ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
       return response;
@@ -160,7 +165,7 @@ class Twoday {
     return {
       valid: hoptypes.includes(skinHoptype),
       prototype: skinHoptype,
-      name: skinName.substr(skinHoptype.length + 1)
+      name: skinName.slice(skinHoptype.length + 1)
     };
   }
 
@@ -168,9 +173,9 @@ class Twoday {
     try {
       this.#checkLoggedIn();
 
-      const response = await this.got.get('members/memberships', {
+      const response = await this.delayed(this.got.get('members/memberships', {
         prefixUrl: this.baseUrl
-      });
+      }));
 
       const $ = cheerio.load(response.body);
       let adminBlogs = [];
@@ -202,7 +207,7 @@ class Twoday {
       this.#checkLoggedIn();
 
       const prefixUrl = await this.getActiveLayoutUrl(alias);
-      const response = await this.got.get('skins/modified', { prefixUrl });
+      const response = await this.delayed(this.got.get('skins/modified', { prefixUrl }));
 
       const $ = cheerio.load(response.body);
       const modSkins = $('.skin>a');
@@ -225,7 +230,7 @@ class Twoday {
 
       const filtered = modifiedSkins.filter(skin => {
         const prototype = skin.name.split('.')[0].toLowerCase();
-        const name = skin.name.substr(prototype.length + 1);
+        const name = skin.name.slice(prototype.length + 1);
         return result.prototype === prototype && result.name === name;
       });
 
@@ -240,9 +245,9 @@ class Twoday {
   async #getLayoutData(alias) {
     this.#checkLoggedIn();
 
-    const response = await this.got.get('layouts/main', {
+    const response = await this.delayed(this.got.get('layouts/main', {
       prefixUrl: `${this.getAliasDomain(alias)}`
-    });
+    }));
 
     const $ = cheerio.load(response.body);
     const layoutLinks = $('a[href*="download"]');
@@ -307,7 +312,7 @@ class Twoday {
       this.#checkLoggedIn();
 
       skin.url = this.fixURL(skin.url);
-      const response = await this.got.get(skin.url);
+      const response = await this.delayed(this.got.get(skin.url));
 
       const $ = cheerio.load(response.body);
       return Object.assign(skin, {
@@ -334,9 +339,9 @@ class Twoday {
       delete data.name;
       delete data.url;
 
-      return await this.got.post(skin.url, {
+      return await this.delayed(this.got.post(skin.url, {
         form: data
-      });
+      }));
     } catch (err) {
       this.#handleError(`postSkin "${skin.name}" failed`, err, cThrowAndExit);
     }
@@ -412,8 +417,6 @@ class Twoday {
         url
       });
 
-      await this.delayNextPromise();
-
       if (options.diff) {
         delete options.diff;
 
@@ -451,16 +454,14 @@ class Twoday {
       const layoutUrl = await this.getActiveLayoutUrl(alias);
 
       const deleteUrl = `${layoutUrl}/skins/${prototype}/${name}/delete`;
-      let response = await this.got.get(deleteUrl);
+      let response = await this.delayed(this.got.get(deleteUrl));
 
-      await this.delayNextPromise();
-
-      response = await this.got.post(deleteUrl, {
+      response = await this.delayed(this.got.post(deleteUrl, {
         form: {
           secretKey: this.#getSecretKey(response.body),
           remove: 'Löschen'
         }
-      });
+      }));
       if (!this.silent)
         console.log(`Skin "${alias}/${skinName}" successfully deleted (statusCode=${response.statusCode}).`);
       return response;
@@ -482,8 +483,6 @@ class Twoday {
         name: skinName,
         url: `${layoutUrl}/skins/edit?key=${skinName}&skinset=&action=`
       });
-
-      await this.delayNextPromise();
 
       delete options.diff;
       const defaults = {
@@ -519,7 +518,7 @@ class Twoday {
 
       const resUrl = `${this.getAliasDomain(alias)}/${resType}/?page=`;
 
-      let response = await this.got.get(`${resUrl}0`);
+      let response = await this.delayed(this.got.get(`${resUrl}0`));
       let $ = cheerio.load(response.body);
       let allItems = returnItemsOnPage($);
       let maxPage = 0;
@@ -530,8 +529,7 @@ class Twoday {
       }
 
       for (let page = 1; page <= maxPage; page++) {
-        await this.delayNextPromise();
-        response = await this.got.get(`${resUrl}${page}`);
+        response = await this.delayed(this.got.get(`${resUrl}${page}`));
         allItems = allItems.concat(returnItemsOnPage(cheerio.load(response.body)));
       }
       return allItems;
@@ -545,7 +543,7 @@ class Twoday {
       this.#checkLoggedIn();
 
       const resUrl = `${this.getAliasDomain(alias)}/${resType}/${resName}`;
-      await this.got.get(resUrl);
+      await this.delayed(this.got.get(resUrl));
       return true;
     } catch (err) {
       return false;
@@ -557,16 +555,14 @@ class Twoday {
       this.#checkLoggedIn();
 
       const deleteUrl = `${this.getAliasDomain(alias)}/${resType}/${resName}/delete`;
-      let response = await this.got.get(deleteUrl);
+      let response = await this.delayed(this.got.get(deleteUrl));
 
-      await this.delayNextPromise();
-
-      response = await this.got.post(deleteUrl, {
+      response = await this.delayed(this.got.post(deleteUrl, {
         form: {
           secretKey: this.#getSecretKey(response.body),
           remove: 'Löschen'
         }
-      });
+      }));
       if (!this.silent)
         console.log(`File "${alias}/${resName}" successfully deleted (statusCode=${response.statusCode}).`);
       return response;
@@ -592,9 +588,7 @@ class Twoday {
       this.#checkLoggedIn();
 
       const createUrl = `${this.getAliasDomain(alias)}/files/create`;
-      let response = await this.got.get(createUrl);
-
-      await this.delayNextPromise();
+      let response = await this.delayed(this.got.get(createUrl));
 
       const form = new FormData();
       form.append('secretKey', this.#getSecretKey(response.body));
@@ -602,9 +596,9 @@ class Twoday {
       form.append('alias', file.name);
       form.append('description', file.description);
       form.append('save', 'Sichern');
-      response = await this.got.post(createUrl, {
+      response = await this.delayed(this.got.post(createUrl, {
         body: form
-      });
+      }));
       if (!this.silent)
         console.log(`File "${alias}/${file.name}" successfully created (statusCode=${response.statusCode}).`);
       const $ = cheerio.load(response.body);
@@ -656,9 +650,7 @@ class Twoday {
       const imgName = param.alias || (param.path || param.url).split('/').pop();
 
       const createUrl = `${this.getAliasDomain(alias)}/images/create`;
-      let response = await this.got.get(createUrl);
-
-      await this.delayNextPromise();
+      let response = await this.delayed(this.got.get(createUrl));
 
       const form = new FormData();
       form.append('secretKey', this.#getSecretKey(response.body));
@@ -672,9 +664,9 @@ class Twoday {
       form.append('width', param.width);
       form.append('height', param.height);
       form.append('save', 'Sichern');
-      response = await this.got.post(createUrl, {
+      response = await this.delayed(this.got.post(createUrl, {
         body: form
-      });
+      }));
       if (!this.silent)
         console.log(`File "${alias}/${imgName}" successfully created (statusCode=${response.statusCode}).`);
       const $ = cheerio.load(response.body);
@@ -704,9 +696,7 @@ class Twoday {
       if (!param.path && !param.url) throw new Error('Replacing image must have an image file path or an URL!');
 
       const replaceUrl = `${this.getAliasDomain(alias)}/images/${imgAlias}/replace`;
-      let response = await this.got.get(replaceUrl);
-
-      await this.delayNextPromise();
+      let response = await this.delayed(this.got.get(replaceUrl));
 
       const form = new FormData();
       form.append('secretKey', this.#getSecretKey(response.body));
@@ -716,9 +706,9 @@ class Twoday {
       form.append('width', param.width);
       form.append('height', param.height);
       form.append('save', 'Sichern');
-      response = await this.got.post(replaceUrl, {
+      response = await this.delayed(this.got.post(replaceUrl, {
         body: form
-      });
+      }));
       if (!this.silent)
         console.log(`Image "${alias}/${imgAlias}" successfully replaced (statusCode=${response.statusCode}).`);
       const $ = cheerio.load(response.body);
@@ -773,8 +763,7 @@ class Twoday {
 
       let stories = [];
       for (let i = fromPage; i <= toPage; i++) {
-        await this.delayNextPromise();
-        const response = await this.got.get(`${storiesPageUrl}${i}`);
+        const response = await this.delayed(this.got.get(`${storiesPageUrl}${i}`));
         const $ = cheerio.load(response.body);
 
         $('tbody').each((index, el) => {
@@ -795,7 +784,7 @@ class Twoday {
   async getStory(alias, id) {
     try {
       const storyUrl = `${this.getAliasDomain(alias)}/stories/${id}`;
-      return await this.got.get(storyUrl);
+      return await this.delayed(this.got.get(storyUrl));
     } catch (err) {
       return null;
     }
@@ -813,9 +802,7 @@ class Twoday {
       this.#validateStory(story);
 
       const storyCreateUrl = `${this.getAliasDomain(alias)}/stories/create`;
-      let response = await this.got.get(storyCreateUrl);
-
-      await this.delayNextPromise();
+      let response = await this.delayed(this.got.get(storyCreateUrl));
 
       const form = {
         secretKey: this.#getSecretKey(response.body),
@@ -833,7 +820,7 @@ class Twoday {
       };
       form[story.action] = true; // save || publish
 
-      response = await this.got.post(storyCreateUrl, { form });
+      response = await this.delayed(this.got.post(storyCreateUrl, { form }));
 
       if (!this.silent)
         console.log(`Story "${alias}/${story.niceurl}" successfully created (statusCode=${response.statusCode}).`);
@@ -866,10 +853,8 @@ class Twoday {
 
       const storyID = story.id || story.niceurl;
       const storyEditUrl = `${this.getAliasDomain(alias)}/stories/${storyID}/edit`;
-      let response = await this.got.get(storyEditUrl);
+      let response = await this.delayed(this.got.get(storyEditUrl));
       const params = this.#getStoryParams(response.body);
-
-      await this.delayNextPromise();
 
       const form = {
         secretKey: params.secretKey,
@@ -887,7 +872,7 @@ class Twoday {
       };
       form[story.action] = true; // save || publish
 
-      response = await this.got.post(storyEditUrl, { form });
+      response = await this.delayed(this.got.post(storyEditUrl, { form }));
 
       if (!this.silent)
         console.log(`Story "${alias}/${storyID}" successfully updated (statusCode=${response.statusCode}).`);
@@ -900,7 +885,7 @@ class Twoday {
   async getStoryTopics(alias) {
     try {
       const storyTopicsUrl = `${this.getAliasDomain(alias)}/topics`;
-      const response = await this.got.get(storyTopicsUrl);
+      const response = await this.delayed(this.got.get(storyTopicsUrl));
 
       const $ = cheerio.load(response.body);
       return $('.listItem td>a')
@@ -919,16 +904,14 @@ class Twoday {
       this.#checkLoggedIn();
 
       const downloadUrl = `${this.getAliasDomain(alias)}/layouts/${layout.name}/download`;
-      let response = await this.got.get(downloadUrl);
+      let response = await this.delayed(this.got.get(downloadUrl));
 
-      await this.delayNextPromise();
-
-      response = await this.got.post(downloadUrl, {
+      response = await this.delayed(this.got.post(downloadUrl, {
         form: {
           secretKey: this.#getSecretKey(response.body),
           changesonly: true
         }
-      });
+      }));
 
       const zip = fs.createWriteStream(layout.path);
       zip.write(response.rawBody);
@@ -943,7 +926,7 @@ class Twoday {
 
   async checkUserAlienVersion(alias) {
     try {
-      const response = await this.got.get(`${this.getAliasDomain(alias)}`);
+      const response = await this.delayed(this.got.get(`${this.getAliasDomain(alias)}`));
       const $ = cheerio.load(response.body);
       const el = $('body')[0];
       return el.attribs['data-version'] || 'N/A';
@@ -960,7 +943,7 @@ class Twoday {
     try {
       this.#checkLoggedIn();
 
-      const response = await this.got.get(`${this.getAliasDomain(alias)}/manage`);
+      const response = await this.delayed(this.got.get(`${this.getAliasDomain(alias)}/manage`));
       const $ = cheerio.load(response.body);
 
       const createInfo = $('.teaserbody p').eq(1).text().trim();

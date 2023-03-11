@@ -2,7 +2,7 @@ const Twoday = require('../src/index');
 require('dotenv-safe').config();
 
 jest.setTimeout(10000);
-const td = new Twoday('dev', { silent: true });
+const td = new Twoday.Twoday('dev', { silent: true });
 const alias = 'neonwilderness';
 
 describe('Can work with Twoday skins', () => {
