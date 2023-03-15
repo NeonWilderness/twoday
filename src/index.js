@@ -771,7 +771,7 @@ class Twoday {
           let title = $el.find('tr>td>b').text().trim();
           let leftColText = $el.find('td.leftCol').text().trim();
           let id = leftColText.match(/story id="(\d*)"/)[1];
-          let createDate = leftColText.slice(-16);
+          let createDate = leftColText.split('\n')[2].slice(-16);
           stories.push({ id, createDate, title });
         });
       }
