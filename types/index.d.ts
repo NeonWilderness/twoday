@@ -129,6 +129,7 @@ export declare class Twoday {
   getMemberships(): Promise<string[]>;
   // helper
   delayNextPromise(): Promise<void>;
+  delayed(gotPromise: Promise): Promise<any>;
   fixURL(url: string): string;
   getAliasDomain(alias: string): string;
   getValidHoptypes(): Promise<string[]>;
