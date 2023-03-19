@@ -8,7 +8,7 @@
 <hr>
 
 ### Get a list of stories
-#### .listStories(alias: string, fromPage: number = 0, toPage: number) : Promise&lt;tResourceInfo[]&gt;
+#### .listStories(alias: string, fromPage: number = 0, toPage: number) : Promise&lt;tStoryList&gt;
 
 Param | Type | Text
 --- | --- | --- 
@@ -22,7 +22,7 @@ tStoryList Property | Type | Text
 fromPage | number | beginning page (starts with 0)
 toPage | number | ending page
 maxPage | number | number of available pages (each page holds up to 20 stories)
-stories | tStoryList | array of *tStoryListItem*
+stories | tStoryListItem[] | array of *tStoryListItem*
 total | number | number of total available stories for this alias
 
 tStoryListItem Property | Type | Text
@@ -30,6 +30,12 @@ tStoryListItem Property | Type | Text
 id | string | the story's id
 createDate | string | date of creation as 'tt.mm.yyyy mm:dd'
 title | string | the story's title
+
+> *fromPage* defaults to 0 (most recent page = most recent 20 stories)
+
+> *toPage* defaults to maxPage (if omitted, all stories of the blog will be returned)
+
+> *toPage* must be greater or equal to *fromPage*
 
 #### Example: List first 2 pages of most recent stories from blog alias 'neonwilderness'
 ```
@@ -41,7 +47,7 @@ console.log(storyInfos);
 ```
 <hr>
 
-### Check if a specific image does exist on a blog alias
+### Reads a specific story from a blog alias
 #### .getStory(alias: string, id: string): Promise&lt;Response&gt; | null
 
 Param | Type | Text
@@ -52,7 +58,7 @@ id | string | the story's id
 - requires: successful login
 - returns: res or null
 
-#### Example: Check if image mySelfie exists on the neonwilderness blog
+#### Example: Read a certain story from the *foundation* blog
 ```
 const td = new Twoday.Twoday('prod');
 await td.login();
@@ -72,12 +78,12 @@ id | string | the story's id
 - requires: successful login
 - returns: boolean
 
-#### Example: Check if image mySelfie exists on the neonwilderness blog
+#### Example: Check if a certain story exists on the *foundation* blog
 ```
 const td = new Twoday.Twoday('prod');
 await td.login();
-const hasStory = await td.getStory('foundation', '1022380953');
-console.log(`The story does ${hasStory ? '' : 'not '}exist.`)
+const exists = await td.hasStory('foundation', '1022380953');
+console.log(`The story does ${exists ? '' : 'not '}exist.`)
 ```
 <hr>
 
@@ -153,7 +159,7 @@ action? | string | 'save' or 'publish'
 
 > If *action* is null or undefined, action 'save' is assumed (story will be saved only but not published)
 
-#### Example: Create a new story on blog alias *neonwilderness*
+#### Example: Update a story on blog alias *neonwilderness*
 ```
 const td = new Twoday.Twoday('prod', { delay: 300 });
 await td.login();
@@ -175,14 +181,14 @@ Param | Type | Text
 --- | --- | --- 
 alias | string | the blog's alias
 
+- returns: Array of tNameUrl
+
 tNameUrl Property | Type | Text
 --- | --- | --- 
 name | string | topic text
 url | string | url of the topic
 
-- returns: Array of tNameUrl
-
-#### Example: Create a new story on blog alias *neonwilderness*
+#### Example: Read all utilized topics from blog alias *neonwilderness*
 ```
 const td = new Twoday.Twoday('prod', { delay: 300 });
 const data = await td.getStoryTopics('neonwilderness');

@@ -1,9 +1,10 @@
 {
   "name": "@neonwilderness/twoday",
-  "version": "0.3.26",
+  "version": "0.3.27",
   "description": "Module to help interact with the most relevant functions of the Twoday blogger platform",
-  "main": "src/index.js",
-  "types": "types/index.d.ts",
+  "main": "./src/index.js",
+  "exports": "./src/index.js",
+  "types": "./types/index.d.ts",
   "scripts": {
     "update": "ncu -u -x chalk,got && npm i",
     "test": "jest"

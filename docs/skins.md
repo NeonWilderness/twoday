@@ -12,7 +12,7 @@ All skin function calls will target the currently active layout. If you want to 
 <hr>
 
 ### Get a list of modified skins
-#### .getModifiedSkins(alias: string) : Promise&lt;tNameUrl&gt;
+#### .getModifiedSkins(alias: string) : Promise&lt;tNameUrl[]&gt;
 
 Param | Type | Text
 --- | --- | --- 

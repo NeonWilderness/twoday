@@ -42,7 +42,7 @@ console.log(resInfos.filter(img => img.mime === 'jpg'));
 Param | Type | Text
 --- | --- | --- 
 alias | string | the blog's alias
-imgName | string | a file name
+imgName | string | a file name tag
 
 - requires: successful login
 - returns: boolean
@@ -80,8 +80,6 @@ height? | string | target height (used if resizeto !== 'no')
 
 #### Example: Update an image 'baum1' on blog alias *neonwilderness*
 ```
-const path = require('path');
-...
 const td = new Twoday.Twoday('prod');
 await td.login();
 const data = { 
@@ -127,8 +125,6 @@ height? | string | target height (used if resizeto !== 'no')
 
 #### Example: Create a new image with the name "baum2" on blog alias *neonwilderness* as part of photo album "My tree images"
 ```
-const path = require('path');
-...
 const td = new Twoday.Twoday('prod');
 await td.login();
 const data = { 
@@ -147,15 +143,13 @@ console.log(`Image ID "${imgID}" successfully created!`);
 Param | Type | Text
 --- | --- | --- 
 alias | string | the blog's alias
-imgName | string | an image name/alias
+imgName | string | an image name tag
 
 - requires: successful login
 - returns: http post response
 
 #### Example: Delete an image ID 'baum3' on blog 'neonwilderness'
 ```
-const path = require('path');
-...
 const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'neonwilderness';

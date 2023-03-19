@@ -159,7 +159,7 @@ export declare class Twoday {
   createImage(alias: string, image: tImageInfo): Promise<tImageID>;
   updateImage(alias: string, image: tImageInfo): Promise<tImageID>;
   // stories
-  listStories(alias: string, fromPage?: number, toPage?: number): Promise<tStoryList[]>;
+  listStories(alias: string, fromPage?: number, toPage?: number): Promise<tStoryList>;
   getStory(alias: string, id: string): Promise<Response> | null;
   hasStory(alias: string, id: string): Promise<boolean>;
   createStory(alias: string, story: tStoryInfo): Promise<Response>;

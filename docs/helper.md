@@ -55,7 +55,7 @@ console.log(url); // https://static.twoday.net
 ```
 <hr>
 
-### Get all valid hoptypes from Twoday's project site
+### Get all valid hoptypes from Twoday's Gitlab project site
 #### .getValidHoptypes(): Promise&lt;string[]&gt;
 
 - returns: array of strings (all valid Hoptypes)
@@ -88,7 +88,7 @@ const result = await td.isValidHoptype('hopsy.display');
 console.log(result);
 ```
 
-Results in:
+Example results in:
 ```
 {
   valid: false,
@@ -111,8 +111,8 @@ resType | tResType | resource type: 'files' or 'images'
 
 tResourceInfo Property | Type | Text
 --- | --- | --- 
-name | string | the image's name
-mime | string | the image's mime type 
-url | string | the image's url
+name | string | the resource's name
+mime | string | the resource's mime type 
+url | string | the resource's url
 
 > Please also check the related [listFiles()](./docs/files.md#get-a-list-of-files) and [listImages()](./docs/images.md#get-a-list-of-images) functions. Both methods internally call *listItems()*.
