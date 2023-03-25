@@ -1,6 +1,6 @@
 {
   "name": "@neonwilderness/twoday",
-  "version": "0.3.27",
+  "version": "0.3.28",
   "description": "Module to help interact with the most relevant functions of the Twoday blogger platform",
   "main": "./src/index.js",
   "exports": "./src/index.js",
@@ -32,7 +32,7 @@
     "cheerio": "^1.0.0-rc.12",
     "diff": "^5.1.0",
     "form-data": "^4.0.0",
-    "got": "^11.8.3",
+    "got": "^11.8.6",
     "tough-cookie": "^4.1.2"
   }
 }

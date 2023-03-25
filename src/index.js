@@ -361,7 +361,7 @@ class Twoday {
     let text;
 
     if (itemChanged) {
-      text = `${header} was length=${s1.length}, ${s1.length === s2.length ? 'now same' : 'now=' + s2.length}:`;
+      text = `${header} length was=${s1.length}, ${s1.length === s2.length ? 'now same' : 'now=' + s2.length}:`;
       process.stdout.write(chalk.cyan(text));
       process.stdout.write('\n');
       differ.forEach(part => {

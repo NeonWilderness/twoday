@@ -79,7 +79,7 @@ describe('Can instantiate a valid Twoday class', () => {
   it('should save/return the layoutUrl of an alias', () => {
     const td = new Twoday.Twoday('prod', { silent: true });
     const alias = 'neonwilderness';
-    const wantedUrl = 'https://neonwilderness.twoday.net/layouts/rainy';
+    const wantedUrl = `${td.getAliasDomain(alias)}/layouts/rainy`;
     return td
       .login()
       .then(() => td.getLayout(alias))
