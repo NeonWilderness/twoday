@@ -761,7 +761,7 @@ class Twoday {
   #validateStory(story) {
     assert.ok(typeof story === 'object', new Error('Story param must be an object!'));
     assert.ok(
-      Object.keys(story).filter(key => !['title', 'niceurl', 'body', 'id', 'topic', 'publish', 'action'].includes(key))
+      Object.keys(story).filter(key => !['title', 'niceurl', 'body', 'id', 'topic', 'publish', 'action', 'event'].includes(key))
         .length === 0,
       new Error('Invalid story param key!')
     );
