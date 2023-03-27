@@ -111,18 +111,20 @@ class Twoday {
       const loginUrl = `${this.baseUrl}/members/login`;
       let response = await this.delayed(this.got.get(loginUrl));
 
-      response = await this.delayed(this.got.post(loginUrl, {
-        form: {
-          secretKey: this.#getSecretKey(response.body),
-          popup: '',
-          step: '',
-          isuser: 1,
-          name: process.env.USER,
-          password: process.env.PASSWORD,
-          remember: 1,
-          login: 'Anmelden'
-        }
-      }));
+      response = await this.delayed(
+        this.got.post(loginUrl, {
+          form: {
+            secretKey: this.#getSecretKey(response.body),
+            popup: '',
+            step: '',
+            isuser: 1,
+            name: process.env.USER,
+            password: process.env.PASSWORD,
+            remember: 1,
+            login: 'Anmelden'
+          }
+        })
+      );
 
       if (!this.silent) console.log(`Login to ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
       return response;
@@ -133,9 +135,11 @@ class Twoday {
 
   async logout() {
     try {
-      const response = await this.delayed(this.got.get('members/logout', {
-        prefixUrl: this.baseUrl
-      }));
+      const response = await this.delayed(
+        this.got.get('members/logout', {
+          prefixUrl: this.baseUrl
+        })
+      );
 
       if (!this.silent) console.log(`Logout of ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
       return response;
@@ -173,9 +177,11 @@ class Twoday {
     try {
       this.#checkLoggedIn();
 
-      const response = await this.delayed(this.got.get('members/memberships', {
-        prefixUrl: this.baseUrl
-      }));
+      const response = await this.delayed(
+        this.got.get('members/memberships', {
+          prefixUrl: this.baseUrl
+        })
+      );
 
       const $ = cheerio.load(response.body);
       let adminBlogs = [];
@@ -245,9 +251,11 @@ class Twoday {
   async #getLayoutData(alias) {
     this.#checkLoggedIn();
 
-    const response = await this.delayed(this.got.get('layouts/main', {
-      prefixUrl: `${this.getAliasDomain(alias)}`
-    }));
+    const response = await this.delayed(
+      this.got.get('layouts/main', {
+        prefixUrl: `${this.getAliasDomain(alias)}`
+      })
+    );
 
     const $ = cheerio.load(response.body);
     const layoutLinks = $('a[href*="download"]');
@@ -339,9 +347,11 @@ class Twoday {
       delete data.name;
       delete data.url;
 
-      return await this.delayed(this.got.post(skin.url, {
-        form: data
-      }));
+      return await this.delayed(
+        this.got.post(skin.url, {
+          form: data
+        })
+      );
     } catch (err) {
       this.#handleError(`postSkin "${skin.name}" failed`, err, cThrowAndExit);
     }
@@ -456,12 +466,14 @@ class Twoday {
       const deleteUrl = `${layoutUrl}/skins/${prototype}/${name}/delete`;
       let response = await this.delayed(this.got.get(deleteUrl));
 
-      response = await this.delayed(this.got.post(deleteUrl, {
-        form: {
-          secretKey: this.#getSecretKey(response.body),
-          remove: 'Löschen'
-        }
-      }));
+      response = await this.delayed(
+        this.got.post(deleteUrl, {
+          form: {
+            secretKey: this.#getSecretKey(response.body),
+            remove: 'Löschen'
+          }
+        })
+      );
       if (!this.silent)
         console.log(`Skin "${alias}/${skinName}" successfully deleted (statusCode=${response.statusCode}).`);
       return response;
@@ -557,12 +569,14 @@ class Twoday {
       const deleteUrl = `${this.getAliasDomain(alias)}/${resType}/${resName}/delete`;
       let response = await this.delayed(this.got.get(deleteUrl));
 
-      response = await this.delayed(this.got.post(deleteUrl, {
-        form: {
-          secretKey: this.#getSecretKey(response.body),
-          remove: 'Löschen'
-        }
-      }));
+      response = await this.delayed(
+        this.got.post(deleteUrl, {
+          form: {
+            secretKey: this.#getSecretKey(response.body),
+            remove: 'Löschen'
+          }
+        })
+      );
       if (!this.silent)
         console.log(`File "${alias}/${resName}" successfully deleted (statusCode=${response.statusCode}).`);
       return response;
@@ -596,9 +610,11 @@ class Twoday {
       form.append('alias', file.name);
       form.append('description', file.description);
       form.append('save', 'Sichern');
-      response = await this.delayed(this.got.post(createUrl, {
-        body: form
-      }));
+      response = await this.delayed(
+        this.got.post(createUrl, {
+          body: form
+        })
+      );
       if (!this.silent)
         console.log(`File "${alias}/${file.name}" successfully created (statusCode=${response.statusCode}).`);
       const $ = cheerio.load(response.body);
@@ -664,9 +680,11 @@ class Twoday {
       form.append('width', param.width);
       form.append('height', param.height);
       form.append('save', 'Sichern');
-      response = await this.delayed(this.got.post(createUrl, {
-        body: form
-      }));
+      response = await this.delayed(
+        this.got.post(createUrl, {
+          body: form
+        })
+      );
       if (!this.silent)
         console.log(`File "${alias}/${imgName}" successfully created (statusCode=${response.statusCode}).`);
       const $ = cheerio.load(response.body);
@@ -706,9 +724,11 @@ class Twoday {
       form.append('width', param.width);
       form.append('height', param.height);
       form.append('save', 'Sichern');
-      response = await this.delayed(this.got.post(replaceUrl, {
-        body: form
-      }));
+      response = await this.delayed(
+        this.got.post(replaceUrl, {
+          body: form
+        })
+      );
       if (!this.silent)
         console.log(`Image "${alias}/${imgAlias}" successfully replaced (statusCode=${response.statusCode}).`);
       const $ = cheerio.load(response.body);
@@ -745,8 +765,12 @@ class Twoday {
         .length === 0,
       new Error('Invalid story param key!')
     );
-    assert.ok(story.title, new Error('Story title must not be empty!'));
-    story.niceurl = this.getNiceUrl(story.niceurl ? story.niceurl : story.title);
+    if (story.event === 'create') { // new story
+      assert.ok(story.title, new Error('Story title must not be empty on create!'));
+      story.niceurl = this.getNiceUrl(story.niceurl ? story.niceurl : story.title);
+    } else { // update existing story
+      assert.ok(story.niceurl || story.id, new Error('Story must have niceurl or id on update!'));
+    }
 
     if (!story.action) story.action = 'save';
     else if (!['save', 'publish'].includes(story.action))
@@ -799,6 +823,7 @@ class Twoday {
     try {
       this.#checkLoggedIn();
 
+      story.event = 'create';
       this.#validateStory(story);
 
       const storyCreateUrl = `${this.getAliasDomain(alias)}/stories/create`;
@@ -846,12 +871,13 @@ class Twoday {
   }
 
   async updateStory(alias, story) {
+    const storyID = story.id || story.niceurl;
     try {
       this.#checkLoggedIn();
 
+      story.event = 'update';
       this.#validateStory(story);
 
-      const storyID = story.id || story.niceurl;
       const storyEditUrl = `${this.getAliasDomain(alias)}/stories/${storyID}/edit`;
       let response = await this.delayed(this.got.get(storyEditUrl));
       const params = this.#getStoryParams(response.body);
@@ -906,12 +932,14 @@ class Twoday {
       const downloadUrl = `${this.getAliasDomain(alias)}/layouts/${layout.name}/download`;
       let response = await this.delayed(this.got.get(downloadUrl));
 
-      response = await this.delayed(this.got.post(downloadUrl, {
-        form: {
-          secretKey: this.#getSecretKey(response.body),
-          changesonly: true
-        }
-      }));
+      response = await this.delayed(
+        this.got.post(downloadUrl, {
+          form: {
+            secretKey: this.#getSecretKey(response.body),
+            changesonly: true
+          }
+        })
+      );
 
       const zip = fs.createWriteStream(layout.path);
       zip.write(response.rawBody);
