@@ -885,7 +885,7 @@ class Twoday {
       const form = {
         secretKey: params.secretKey,
         content_title: story.title || params.content_title,
-        modNiceUrls_urlid: story.niceurl || params.niceurl,
+        modNiceUrls_urlid: story.niceurl || params.modNiceUrls_urlid,
         content_text: story.body || params.content_text,
         addToFront: params.addToFront,
         checkbox_addToFront: 'addToFront',
