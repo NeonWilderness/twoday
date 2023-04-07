@@ -67,3 +67,27 @@ Results in (as per 07.11.2021 ;):
   trustedSite: false
 }
 ```
+
+### Get all members of a blog
+#### .getMembers(alias: string): Promise&lt;tMember[]&gt;
+
+Param | Type | Text
+--- | --- | --- 
+alias | string | the blog's alias
+
+- requires: successful login
+- returns: Array of tMember object
+
+tMember Property | Type | Text
+--- | --- | --- 
+alias | string | the member's alias
+role | string | the member's role, i.e. 'Owner', 'Administrator', 'Contentmanager', 'Contributor', 'Subscriber'
+url | string | the member's url, e.g. blog url or mail adress; may be empty as well
+
+#### Example: Get all members of the neonwilderness blog
+```
+const td = new Twoday.Twoday('prod');
+await td.login();
+const members = await td.getMembers('neonwilderness');
+console.log(JSON.stringify(members, null, 2));
+```

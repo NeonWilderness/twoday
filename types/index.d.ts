@@ -6,6 +6,12 @@ export interface tUserOptions {
   agreedVersion?: string;
   silent?: boolean;
 }
+export type tMemberType = 'Owner' | 'Administrator' | 'Contentmanager' | 'Contributor' | 'Subscriber';
+export interface tMember {
+  alias: string;
+  role: tMemberType;
+  url: string;
+}
 export interface tIsValidHoptype {
   valid: boolean;
   prototype: string;
@@ -127,6 +133,7 @@ export declare class Twoday {
   login(): Promise<Response>;
   logout(): Promise<Response>;
   getMemberships(): Promise<string[]>;
+  getMembers(): Promise<tMember[]>;
   // helper
   delayNextPromise(): Promise<void>;
   delayed(gotPromise: Promise): Promise<any>;

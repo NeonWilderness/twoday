@@ -104,4 +104,26 @@ describe('Can instantiate a valid Twoday class', () => {
         expect(adminBlogs.length).toBeGreaterThan(0);
       });
   });
+
+  it('should return the members', () => {
+    const td = new Twoday.Twoday('prod', { silent: true });
+    return td
+      .login()
+      .then(() => td.getMembers('mmm'))
+      .then(members => {
+        console.log(`Members: ${members.length}`);
+        console.log(JSON.stringify(members, null, 2));
+        expect(Array.isArray(members)).toBeTruthy();
+        expect(members.length).toBeGreaterThan(0);
+        for (let tMember of members) {
+          const tMemberKeys = Object.keys(tMember);
+          expect(tMemberKeys).toHaveLength(3);
+          expect(tMemberKeys).toContain('alias');
+          expect(tMemberKeys).toContain('role');
+          expect(tMemberKeys).toContain('url');
+          expect(tMember.alias).toBeTruthy();
+          expect(tMember.role).toMatch(/^(Owner|Administrator|Contentmanager|Contributor|Subscriber)/);
+        }
+      });
+  });
 });

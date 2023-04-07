@@ -208,6 +208,42 @@ class Twoday {
     }
   }
 
+  async getMembers(alias) {
+    const returnItemsOnPage = $$ =>
+      $$('.listItemLeft')
+        .map((_i, el) => {
+          const $$el = $$(el);
+          const role = $$el.find('span').eq(0).text().split(': ')[1];
+          const alias = $$el.find('h4').text();
+          const url = $$el.find('p>a').attr('href') || '';
+          return { alias, role, url };
+        })
+        .get();
+
+    try {
+      this.#checkLoggedIn();
+
+      const resUrl = `${this.getAliasDomain(alias)}/members/?page=`;
+      let response = await this.delayed(this.got.get(`${resUrl}0`));
+      let $ = cheerio.load(response.body);
+      let allItems = returnItemsOnPage($);
+      let maxPage = 0;
+      const $pageNav = $('.pageNavSummary:first'); // e.g. "zeige 1-20 (von 50)"
+      if ($pageNav) {
+        const totalItems = parseInt($pageNav.text().split(' ').pop());
+        maxPage = Math.floor(totalItems / 20);
+      }
+
+      for (let page = 1; page <= maxPage; page++) {
+        response = await this.delayed(this.got.get(`${resUrl}${page}`));
+        allItems = allItems.concat(returnItemsOnPage(cheerio.load(response.body)));
+      }
+      return allItems;
+    } catch (err) {
+      this.#handleError(`getMembers failed for "${alias}"`, err, cThrowAndExit);
+    }
+  }
+
   async getModifiedSkins(alias) {
     try {
       this.#checkLoggedIn();
@@ -219,7 +255,7 @@ class Twoday {
       const modSkins = $('.skin>a');
       if (!modSkins) return [];
       return modSkins
-        .map(function (i, el) {
+        .map(function (_i, el) {
           const $el = $(el);
           return { name: $el.attr('name'), url: $el.attr('href') };
         })
@@ -514,7 +550,7 @@ class Twoday {
   async listItems(alias, resType) {
     const returnItemsOnPage = $$ =>
       $$('.leftCol')
-        .map((i, el) => {
+        .map((_i, el) => {
           const $$el = $$(el);
           const parts = $$el.text().split('/');
           const name = parts[0].match(/name="(.*?)"/)[1];
@@ -761,14 +797,17 @@ class Twoday {
   #validateStory(story) {
     assert.ok(typeof story === 'object', new Error('Story param must be an object!'));
     assert.ok(
-      Object.keys(story).filter(key => !['title', 'niceurl', 'body', 'id', 'topic', 'publish', 'action', 'event'].includes(key))
-        .length === 0,
+      Object.keys(story).filter(
+        key => !['title', 'niceurl', 'body', 'id', 'topic', 'publish', 'action', 'event'].includes(key)
+      ).length === 0,
       new Error('Invalid story param key!')
     );
-    if (story.event === 'create') { // new story
+    if (story.event === 'create') {
+      // new story
       assert.ok(story.title, new Error('Story title must not be empty on create!'));
       story.niceurl = this.getNiceUrl(story.niceurl ? story.niceurl : story.title);
-    } else { // update existing story
+    } else {
+      // update existing story
       assert.ok(story.niceurl || story.id, new Error('Story must have niceurl or id on update!'));
     }
 
@@ -915,7 +954,7 @@ class Twoday {
 
       const $ = cheerio.load(response.body);
       return $('.listItem td>a')
-        .map((i, el) => {
+        .map((_i, el) => {
           let $el = $(el);
           return { name: $el.text(), url: $el.attr('href') };
         })
@@ -979,7 +1018,7 @@ class Twoday {
       const [creator, createDate] = createInfo.match(filter[lang].m)[1].split(filter[lang].s);
 
       const [stories, comments, images, files] = $('.teaserbody strong')
-        .map((i, el) => parseInt($(el).text()))
+        .map((_i, el) => parseInt($(el).text()))
         .get();
 
       const diskUsageNumbers = $('.diskusage').eq(0).prev().text().trim().match(/(\d+)/g);
