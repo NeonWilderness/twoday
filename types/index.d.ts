@@ -91,6 +91,10 @@ export interface tLayoutData {
 }
 export type tStoryID = string | number;
 export type tStoryAction = 'save' | 'publish';
+export interface tStoryKeys {
+  id: tStoryID;
+  niceurl: string;
+}
 export interface tStoryInfo {
   title: string;
   body: string;
@@ -169,7 +173,7 @@ export declare class Twoday {
   listStories(alias: string, fromPage?: number, toPage?: number): Promise<tStoryList>;
   getStory(alias: string, id: string): Promise<Response> | null;
   hasStory(alias: string, id: string): Promise<boolean>;
-  createStory(alias: string, story: tStoryInfo): Promise<Response>;
+  createStory(alias: string, story: tStoryInfo): Promise<tStoryKeys>;
   updateStory(alias: string, story: tStoryInfo): Promise<Response>;
   getStoryTopics(alias: string): Promise<tNameUrl[]>;
   // layout

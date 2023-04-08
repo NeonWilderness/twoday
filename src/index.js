@@ -185,7 +185,7 @@ class Twoday {
 
       const $ = cheerio.load(response.body);
       let adminBlogs = [];
-      $('.listItem').each((index, el) => {
+      $('.listItem').each((_index, el) => {
         let $el = $(el);
         let authLevel = $el
           .find('.listItemLeft')
@@ -208,22 +208,11 @@ class Twoday {
     }
   }
 
-  async getMembers(alias) {
-    const returnItemsOnPage = $$ =>
-      $$('.listItemLeft')
-        .map((_i, el) => {
-          const $$el = $$(el);
-          const role = $$el.find('span').eq(0).text().split(': ')[1];
-          const alias = $$el.find('h4').text();
-          const url = $$el.find('p>a').attr('href') || '';
-          return { alias, role, url };
-        })
-        .get();
-
+  async #fetchItems(alias, hoptype, returnItemsOnPage) {
     try {
       this.#checkLoggedIn();
 
-      const resUrl = `${this.getAliasDomain(alias)}/members/?page=`;
+      const resUrl = `${this.getAliasDomain(alias)}/${hoptype}/?page=`;
       let response = await this.delayed(this.got.get(`${resUrl}0`));
       let $ = cheerio.load(response.body);
       let allItems = returnItemsOnPage($);
@@ -240,8 +229,23 @@ class Twoday {
       }
       return allItems;
     } catch (err) {
-      this.#handleError(`getMembers failed for "${alias}"`, err, cThrowAndExit);
+      this.#handleError(`#fetchItems failed for "${alias}" @ "${hoptype}"`, err, cThrowAndExit);
     }
+  }
+
+  async getMembers(alias) {
+    const returnMembers = $$ =>
+      $$('.listItemLeft')
+        .map((_i, el) => {
+          const $$el = $$(el);
+          const role = $$el.find('span').eq(0).text().split(': ')[1];
+          const alias = $$el.find('h4').text();
+          const url = this.fixURL($$el.find('p>a').attr('href') || '');
+          return { alias, role, url };
+        })
+        .get();
+
+    return await this.#fetchItems(alias, 'members', returnMembers);
   }
 
   async getModifiedSkins(alias) {
@@ -548,7 +552,7 @@ class Twoday {
   }
 
   async listItems(alias, resType) {
-    const returnItemsOnPage = $$ =>
+    const returnResources = $$ =>
       $$('.leftCol')
         .map((_i, el) => {
           const $$el = $$(el);
@@ -561,26 +565,8 @@ class Twoday {
         .get();
 
     try {
-      this.#checkLoggedIn();
       if (!['files', 'images'].includes(resType)) throw new Error('Param "resType" must be "files" or "images".');
-
-      const resUrl = `${this.getAliasDomain(alias)}/${resType}/?page=`;
-
-      let response = await this.delayed(this.got.get(`${resUrl}0`));
-      let $ = cheerio.load(response.body);
-      let allItems = returnItemsOnPage($);
-      let maxPage = 0;
-      const $pageNav = $('.pageNavSummary:first'); // e.g. "zeige 1-20 (von 70)"
-      if ($pageNav) {
-        const totalItems = parseInt($pageNav.text().split(' ').pop());
-        maxPage = Math.floor(totalItems / 20);
-      }
-
-      for (let page = 1; page <= maxPage; page++) {
-        response = await this.delayed(this.got.get(`${resUrl}${page}`));
-        allItems = allItems.concat(returnItemsOnPage(cheerio.load(response.body)));
-      }
-      return allItems;
+      return await this.#fetchItems(alias, resType, returnResources);
     } catch (err) {
       this.#handleError(`Error while getting the list of "${resType}" for "${alias}"`, err, cThrowAndExit);
     }
@@ -829,7 +815,7 @@ class Twoday {
         const response = await this.delayed(this.got.get(`${storiesPageUrl}${i}`));
         const $ = cheerio.load(response.body);
 
-        $('tbody').each((index, el) => {
+        $('tbody').each((_index, el) => {
           let $el = $(el);
           let title = $el.find('tr>td>b').text().trim();
           let leftColText = $el.find('td.leftCol').text().trim();
@@ -872,7 +858,7 @@ class Twoday {
         secretKey: this.#getSecretKey(response.body),
         content_title: story.title,
         modNiceUrls_urlid: story.niceurl,
-        content_text: story.body || '',
+        content_text: story.body || '<p>Hello World!</p>',
         addToFront: '1',
         checkbox_addToFront: 'addToFront',
         addToTopic: '',
@@ -885,10 +871,17 @@ class Twoday {
       form[story.action] = true; // save || publish
 
       response = await this.delayed(this.got.post(storyCreateUrl, { form }));
+      const $ = cheerio.load(response.body);
+      const newStoryID = $('.leftCol')
+        .eq(0)
+        .text()
+        .match(/story id="(\d+)"/)[1];
 
       if (!this.silent)
-        console.log(`Story "${alias}/${story.niceurl}" successfully created (statusCode=${response.statusCode}).`);
-      return response;
+        console.log(
+          `Story "${alias}/${story.niceurl}" (id ${newStoryID}) successfully created (statusCode=${response.statusCode}).`
+        );
+      return { id: newStoryID, niceurl: story.niceurl };
     } catch (err) {
       this.#handleError(`Error while creating story "${alias}/${story.niceurl}"`, err, cThrowAndExit);
     }

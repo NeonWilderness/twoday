@@ -42,7 +42,7 @@ describe('Can work with Twoday files', () => {
     return td.login()
       .then(() => td.listFiles(alias))
       .then(files => {
-        // console.log(files);
+        console.log(files);
         expect(Array.isArray(files)).toBeTruthy();
         expect(files.length).toBeGreaterThan(60);
         expect(typeof files[0]).toBe('object');

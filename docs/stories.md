@@ -105,7 +105,12 @@ publish? | string | datetimestamp as publish date of the story
 action? | string | 'save' or 'publish'
 
 - requires: successful login
-- returns: Response
+- returns: tStoryKeys object 
+
+tStoryKeys Property | Type | Text
+--- | --- | --- 
+id | string | the new story id
+niceurl | string | the nice url string
 
 > *title* and *body* are required parameters.
 
