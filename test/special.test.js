@@ -45,4 +45,22 @@ describe('Can return info about an alias', () => {
     expect(infos.usedKB).toBeGreaterThan(102400);
     expect(infos.trustedSite).toBeTruthy();
   });
+  
+  it('should return the static URL without resType', async () => {
+    await td.login();
+    const url = await td.getStaticUrl('neonwilderness');
+    expect(url).toBe('https://static.twoday.net/NeonWilderness/');
+  });
+  
+  it('should return the static URL with a resType "images"', async () => {
+    await td.login();
+    const url = await td.getStaticUrl('neonwilderness', 'images');
+    expect(url).toBe('https://static.twoday.net/NeonWilderness/images/');
+  });
+  
+  it('should return the static URL with a resType "files"', async () => {
+    await td.login();
+    const url = await td.getStaticUrl('neonwilderness', 'files');
+    expect(url).toBe('https://static.twoday.net/NeonWilderness/files/');
+  });
 });

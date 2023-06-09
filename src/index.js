@@ -32,6 +32,7 @@ class Twoday {
     this.fullDomain = `twoday${this.#getDomain()}`;
     this.baseUrl = `https://${this.fullDomain}`;
     this.layout = {};
+    this.static = { alias: null, resType: null, url: null };
     this.delay = Math.abs(options.delay); // ms
     this.silent = options.silent; // true=no console messages
     this.version = pkg.version;
@@ -569,6 +570,21 @@ class Twoday {
       return await this.#fetchItems(alias, resType, returnResources);
     } catch (err) {
       this.#handleError(`Error while getting the list of "${resType}" for "${alias}"`, err, cThrowAndExit);
+    }
+  }
+
+  async getStaticUrl(alias, resType) {
+    try {
+      if (alias === this.static.alias && resType === this.static.resType) return this.static.url;
+      const iconUrl = `${this.getAliasDomain(alias)}/images/icon`;
+      this.static.alias = alias;
+      this.static.resType = resType;
+      const res = await this.delayed(this.got.get(iconUrl));
+      const staticURL = `${res.url.split('/').splice(0, 4).join('/')}/`;
+      this.static.url = resType ? `${staticURL}${resType}/` : staticURL;
+      return this.static.url;
+    } catch (err) {
+      return null;
     }
   }
 
