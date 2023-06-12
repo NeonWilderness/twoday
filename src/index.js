@@ -6,7 +6,7 @@ const chalk = require('chalk');
 const cheerio = require('cheerio');
 const { convertChangesToXML, diffLines } = require('diff');
 const FormData = require('form-data');
-const fs = require('fs');
+const fs = require('node:fs');
 const got = require('got');
 const pkg = require('../package.json');
 const tough = require('tough-cookie');
@@ -21,7 +21,7 @@ const cThrowAndExit = true;
 
 class Twoday {
   constructor(platform, userOptions = {}) {
-    const defaults = { delay: 20, agreedVersion: '20190210a', silent: false };
+    const defaults = { delay: 100, agreedVersion: '20190210a', silent: false };
     const options = Object.assign({}, defaults, userOptions);
     assert.ok(typeof platform === 'string', new Error('Param "platform" must be a string!'));
     assert.ok(typeof options.agreedVersion === 'string', new Error('User option "agreedVersion" must be a string!'));
@@ -86,6 +86,22 @@ class Twoday {
     return `https://${alias}.${this.fullDomain}`;
   }
 
+  async getStaticUrl(alias, resType) {
+    try {
+      if (alias !== this.static.alias || resType !== this.static.resType) {
+        const iconUrl = `${this.getAliasDomain(alias)}/images/icon`;
+        this.static.alias = alias;
+        this.static.resType = resType;
+        const res = await this.delayed(this.got.get(iconUrl));
+        const staticURL = `${res.url.split('/').splice(0, 4).join('/')}/`;
+        this.static.url = resType ? `${staticURL}${resType}/` : staticURL;
+      }
+      return this.static.url;
+    } catch (err) {
+      return null;
+    }
+  }
+
   #getSecretKey(data) {
     const $ = cheerio.load(data);
     return $('[name="secretKey"]').val();
@@ -96,7 +112,7 @@ class Twoday {
   }
 
   #handleError(text, err = null, throwAndExit = false) {
-    const message = `${text}${err ? ' --> ' + err : ''}`;
+    const message = `${text}${err ? ' --> ' + err.toString() : ''}`;
     console.log(chalk.red(message));
     if (throwAndExit) {
       console.log(chalk.red('Process halted.'));
@@ -306,7 +322,7 @@ class Twoday {
     this.layout[alias] = {
       activeLayoutUrl,
       activeLayoutName: activeLayoutUrl.split('/').pop(),
-      layoutNames: Array.from(layoutLinks).map(a => a.attribs.href.match(/layouts\/(\w*)\//)[1])
+      layoutNames: Array.from(layoutLinks).map(a => a.attribs.href.match(/layouts\/([\w-]*)\//)[1])
     };
     return this.layout[alias];
   }
@@ -573,21 +589,6 @@ class Twoday {
     }
   }
 
-  async getStaticUrl(alias, resType) {
-    try {
-      if (alias === this.static.alias && resType === this.static.resType) return this.static.url;
-      const iconUrl = `${this.getAliasDomain(alias)}/images/icon`;
-      this.static.alias = alias;
-      this.static.resType = resType;
-      const res = await this.delayed(this.got.get(iconUrl));
-      const staticURL = `${res.url.split('/').splice(0, 4).join('/')}/`;
-      this.static.url = resType ? `${staticURL}${resType}/` : staticURL;
-      return this.static.url;
-    } catch (err) {
-      return null;
-    }
-  }
-
   async hasItem(alias, resType, resName) {
     try {
       this.#checkLoggedIn();
@@ -597,6 +598,34 @@ class Twoday {
       return true;
     } catch (err) {
       return false;
+    }
+  }
+
+  async downloadItems(listItems, path) {
+    try {
+      assert.ok(Array.isArray(listItems), new Error('listItems param must be an array!'));
+      if (!listItems.length) {
+        if (!this.silent) console.log('Empty listItems: got nothing to download.');
+        return;
+      }
+      assert.ok(typeof listItems[0] === 'object', new Error('listItems array must be contain objects!'));
+      const keys = Object.keys(listItems[0]);
+      assert.ok(
+        keys.includes('name') && keys.includes('url'),
+        new Error('listItems objects must have properties "name" and "url"!')
+      );
+
+      for (const item of listItems) {
+        const downloadPath = `${path}${item.url.slice(item.url.lastIndexOf('/'))}`;
+        const fileStream = fs.createWriteStream(downloadPath);
+        const downloadItemAsBuffer = await this.delayed(this.got.get(item.url).buffer());
+        fileStream.write(downloadItemAsBuffer);
+        fileStream.end();
+        if (!this.silent) console.log(`Download of "${item.name}" completed.`);
+      }
+      if (!this.silent) console.log(`Finished downloading ${listItems.length} items.`);
+    } catch (err) {
+      this.#handleError('Error while downloading items', err, cThrowAndExit);
     }
   }
 
@@ -669,6 +698,15 @@ class Twoday {
       return await this.createFile(alias, file);
     } catch (err) {
       this.#handleError(`Error while updating file "${alias}/${file.name}"`, err, cThrowAndExit);
+    }
+  }
+
+  async downloadFiles(alias, path) {
+    try {
+      const files = await td.listFiles(alias);
+      await td.downloadItems(files, path);
+    } catch (err) {
+      this.#handleError(`Error while downloading files for "${alias}"`, err, cThrowAndExit);
     }
   }
 
@@ -773,6 +811,15 @@ class Twoday {
       return $('td>b').eq(0).text();
     } catch (err) {
       this.#handleError(`Error while replacing image "${alias}/${imgAlias}"`, err, cThrowAndExit);
+    }
+  }
+
+  async downloadImages(alias, path) {
+    try {
+      const images = await td.listImages(alias);
+      await td.downloadItems(images, path);
+    } catch (err) {
+      this.#handleError(`Error while downloading images for "${alias}"`, err, cThrowAndExit);
     }
   }
 

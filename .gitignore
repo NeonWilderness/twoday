@@ -2,6 +2,8 @@
 .prettierrc.json
 .vscode
 *.zip
+downloads
 node_modules
 notes.txt
 test.jpg
+try.js

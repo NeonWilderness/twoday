@@ -36,6 +36,25 @@ console.log(url); // https://neonwilderness.twoday.net
 ```
 <hr>
 
+### Returns the individual static url, if desired incl. a specific resource path
+#### .getStaticUrl(alias: string, resType?: string)
+
+Param | Type | Text
+--- | --- | --- 
+alias | string | the blog's alias
+resType? | string | 'images' or 'files'
+
+- returns: the blog's static url as string
+
+#### Example
+```
+const td = new Twoday.Twoday('prod');
+const url1 = td.getStaticUrl('neonwilderness');
+console.log(url1); // https://static.twoday.net/NeonWilderness/
+const url2 = td.getStaticUrl('neonwilderness', 'images');
+console.log(url2); // https://static.twoday.net/NeonWilderness/images/
+```<hr>
+
 ### Adds the https protocol to an URL when it is missing
 #### .fixURL(url): string
 
