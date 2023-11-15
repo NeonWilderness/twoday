@@ -73,7 +73,7 @@ class Twoday {
   #getDomain() {
     switch (this.platform) {
       case 'dev':
-        return '-test.click';
+        return '-test.net';
       case 'prod':
         return '.net';
       default:
