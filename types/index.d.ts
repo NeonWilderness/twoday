@@ -143,6 +143,7 @@ export declare class Twoday {
   delayed(gotPromise: Promise): Promise<any>;
   fixURL(url: string): string;
   getAliasDomain(alias: string): string;
+  getStaticUrl(alias: string, resType: tResType): string;
   getValidHoptypes(): Promise<string[]>;
   isValidHoptype(skinName: string): Promise<tIsValidHoptype>;
   listItems(alias: string, resType: tResType): Promise<tResourceInfo[]>;
@@ -163,13 +164,16 @@ export declare class Twoday {
   deleteFile(alias: string, fileName: string): Promise<Response>;
   createFile(alias: string, file: tFileInfo): Promise<tFileID>;
   updateFile(alias: string, file: tFileInfo): Promise<tFileID>;
+  downloadFiles(alias: string, path: string): void;
   // images
   listImages(alias: string): Promise<tResourceInfo[]>;
   hasImage(alias: string, imgName: string): Promise<boolean>;
   deleteImage(alias: string, imgName: string): Promise<Response>;
   createImage(alias: string, image: tImageInfo): Promise<tImageID>;
   updateImage(alias: string, image: tImageInfo): Promise<tImageID>;
+  downloadImages(alias: string, path: string): void;
   // stories
+  getNiceUrl(url: string): string;
   listStories(alias: string, fromPage?: number, toPage?: number): Promise<tStoryList>;
   getStory(alias: string, id: string): Promise<Response> | null;
   hasStory(alias: string, id: string): Promise<boolean>;
