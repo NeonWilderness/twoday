@@ -148,8 +148,8 @@ const data = {
   path: path.resolve(process.cwd(), 'local/bg.jpg'),
   layout: 'default'
 }
-const imgID = await td.createImage('recycle', data);
-console.log(`Layout Image ID "${imgID}" successfully created!`);
+await td.createImage('recycle', data);
+console.log(`Layout Image ID "${data.alias}" successfully created!`);
 ```
 <hr>
 

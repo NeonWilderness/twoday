@@ -88,7 +88,7 @@ Param | Type | Text
 alias | string | a blog's alias
 
 - requires: successful login
-- returns: layoutUrl as string
+- returns: layoutName as string
 
 > This is a syntactic sugar function to the full info provider function *getLayout()*.
 

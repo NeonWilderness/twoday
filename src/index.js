@@ -766,7 +766,7 @@ class Twoday {
         })
       );
       if (!this.silent)
-        console.log(`File "${alias}/${imgName}" successfully created (statusCode=${response.statusCode}).`);
+        console.log(`${layout ? 'Layout ' : ''}Image "${alias}/${imgName}" successfully created (statusCode=${response.statusCode}).`);
       const $ = cheerio.load(response.body);
       return $('td>b').eq(0).text();
     } catch (err) {
