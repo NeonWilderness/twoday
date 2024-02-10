@@ -113,6 +113,7 @@ addToTopic? | string | add image to an existing photo album
 topic? | string | name of a new photo album
 width? | string | target width (used if resizeto !== 'no')
 height? | string | target height (used if resizeto !== 'no')
+layout? | string | an existing layout name of this alias
 
 - requires: successful login
 - returns: tImageID string (alias)
@@ -122,6 +123,8 @@ height? | string | target height (used if resizeto !== 'no')
 > tImageID is the resulting name tag for the image, either defined by tImageInfo.alias or derived by the system. If the same image name already exists, a new entry will be created and a sequential number will be added to tImageID (starting with "0"). It is strongly recommended to always check/use the returned tImageID as this may differ from the originally intended image name.
 
 > If the file does already exist, a copy will be created.
+
+> If param "layout" is passed, the image will instead be added to this layout as a layout image. When creating a layout image, the params "topic" and "addToTopic" will be ignored.
 
 #### Example: Create a new image with the name "baum2" on blog alias *neonwilderness* as part of photo album "My tree images"
 ```
@@ -134,6 +137,19 @@ const data = {
 }
 const imgID = await td.createImage('neonwilderness', data);
 console.log(`Image ID "${imgID}" successfully created!`);
+```
+
+#### Example: Create a new layout image with the target name "bg" in blog alias *recycle* within its layout name *default*
+```
+const td = new Twoday.Twoday('prod');
+await td.login();
+const data = { 
+  alias: 'bg',
+  path: path.resolve(process.cwd(), 'local/bg.jpg'),
+  layout: 'default'
+}
+const imgID = await td.createImage('recycle', data);
+console.log(`Layout Image ID "${imgID}" successfully created!`);
 ```
 <hr>
 

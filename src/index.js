@@ -735,13 +735,15 @@ class Twoday {
         topic: '',
         resizeto: 'no',
         width: '400',
-        height: '400'
+        height: '400',
+        layout: ''
       };
       const param = Object.assign(defaults, image);
       if (!param.path && !param.url) throw new Error('New image must have an image file path or an URL!');
       const imgName = param.alias || (param.path || param.url).split('/').pop();
 
-      const createUrl = `${this.getAliasDomain(alias)}/images/create`;
+      const layout = param.layout ? `/layouts/${param.layout}` : '';
+      const createUrl = `${this.getAliasDomain(alias)}${layout}/images/create`;
       let response = await this.delayed(this.got.get(createUrl));
 
       const form = new FormData();
@@ -750,8 +752,10 @@ class Twoday {
       form.append('url', param.url || '');
       form.append('alias', param.alias);
       form.append('alttext', param.alttext); // img description and img alt="..."
-      form.append('addToTopic', param.addToTopic);
-      form.append('topic', param.topic);
+      if (!layout) {
+        form.append('addToTopic', param.addToTopic);
+        form.append('topic', param.topic);
+      }
       form.append('resizeto', param.resizeto);
       form.append('width', param.width);
       form.append('height', param.height);
