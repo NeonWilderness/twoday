@@ -22,8 +22,8 @@ describe('Can instantiate a valid Twoday class', () => {
   it('should work with platform=dev', () => {
     const td = new Twoday.Twoday('dev', { silent: true });
     expect(td.platform).toBe('dev');
-    expect(td.fullDomain).toBe('twoday-test.click');
-    expect(td.baseUrl).toBe('https://twoday-test.click');
+    expect(td.fullDomain).toBe('twoday-test.net');
+    expect(td.baseUrl).toBe('https://twoday-test.net');
     expect(typeof td.layout).toBe('object');
     expect(Object.keys(td.layout)).toHaveLength(0);
     expect(td.delay).toBe(20);
@@ -31,7 +31,7 @@ describe('Can instantiate a valid Twoday class', () => {
     const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
     expect(c.key).toBe('agreed');
     expect(c.value).toBe('20190210a');
-    expect(c.domain).toBe('twoday-test.click');
+    expect(c.domain).toBe('twoday-test.net');
     expect(c.secure).toBeTruthy();
   });
 
@@ -42,7 +42,7 @@ describe('Can instantiate a valid Twoday class', () => {
   it('should consider platform=dev, delay=40, agreed=20210517b', () => {
     const td = new Twoday.Twoday('dev', { delay: 40, agreedVersion: '20210517b', silent: true });
     expect(td.platform).toBe('dev');
-    expect(td.fullDomain).toBe('twoday-test.click');
+    expect(td.fullDomain).toBe('twoday-test.net');
     expect(typeof td.layout).toBe('object');
     expect(Object.keys(td.layout)).toHaveLength(0);
     expect(td.delay).toBe(40);
@@ -50,7 +50,7 @@ describe('Can instantiate a valid Twoday class', () => {
     const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
     expect(c.key).toBe('agreed');
     expect(c.value).toBe('20210517b');
-    expect(c.domain).toBe('twoday-test.click');
+    expect(c.domain).toBe('twoday-test.net');
     expect(c.secure).toBeTruthy();
   });
 
@@ -62,8 +62,8 @@ describe('Can instantiate a valid Twoday class', () => {
 
   it('should get proper DEV alias domains', () => {
     const td = new Twoday.Twoday('dev', { silent: true });
-    expect(td.getAliasDomain('neonwilderness')).toBe('https://neonwilderness.twoday-test.click');
-    expect(td.getAliasDomain('info')).toBe('https://info.twoday-test.click');
+    expect(td.getAliasDomain('neonwilderness')).toBe('https://neonwilderness.twoday-test.net');
+    expect(td.getAliasDomain('info')).toBe('https://info.twoday-test.net');
     expect(() => td.getAliasDomain('')).toThrow();
     expect(() => td.getAliasDomain()).toThrow();
   });

@@ -79,6 +79,7 @@ export interface tImageInfo {
   resizeto?: tResizeTo;
   width?: string;
   height?: string;
+  layout?: string;
 }
 export interface tLayoutInfo {
   name: string;
