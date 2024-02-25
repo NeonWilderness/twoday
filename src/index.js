@@ -21,8 +21,7 @@ const cThrowAndExit = true;
 
 class Twoday {
   constructor(platform, userOptions = {}) {
-    const agreedVersion = platform === 'prod'? '20190210a' : '20240210a'; // temporary fix
-    const defaults = { delay: 100, agreedVersion, silent: false };
+    const defaults = { delay: 100, agreedVersion: '20240210a', silent: false };
     const options = Object.assign({}, defaults, userOptions);
     assert.ok(typeof platform === 'string', new Error('Param "platform" must be a string!'));
     assert.ok(typeof options.agreedVersion === 'string', new Error('User option "agreedVersion" must be a string!'));
