@@ -49,8 +49,8 @@ options | tUserOptions | object
 
 tUserOptions Property | Type | Default | Text
 --- | --- | --- | ---
-delay? | number | 20 | Delay in ms between http calls
-agreed? | string | '20190210a' | Current "Agreed terms of usage" version
+delay? | number | 100 | Delay in ms between http calls
+agreed? | string | '20240210a' | Current "Agreed terms of usage" version
 silent? | boolean | false | Suppress console messages
 
 > The options field may even be empty or completely omitted.

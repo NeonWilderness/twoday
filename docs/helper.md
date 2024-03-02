@@ -12,7 +12,7 @@
 
 - returns: void
 
-> This delay function comes in handy in between of repetitive http calls to avoid hammering the server. The default waiting time is 20ms but may be modified by a constructor option.
+> This delay function comes in handy in between of repetitive http calls to avoid hammering the server. The default waiting time is 100ms but may be modified by a constructor option.
 
 #### Example
 
@@ -53,7 +53,8 @@ const url1 = td.getStaticUrl('neonwilderness');
 console.log(url1); // https://static.twoday.net/NeonWilderness/
 const url2 = td.getStaticUrl('neonwilderness', 'images');
 console.log(url2); // https://static.twoday.net/NeonWilderness/images/
-```<hr>
+```
+<hr>
 
 ### Adds the https protocol to an URL when it is missing
 #### .fixURL(url): string

@@ -143,6 +143,7 @@ class Twoday {
         })
       );
 
+      if (!this.#checkLoggedIn()) throw new Error('Invalid cookies!');
       if (!this.silent) console.log(`Login to ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
       return response;
     } catch (err) {
