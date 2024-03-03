@@ -13,10 +13,6 @@
 - returns: void
 
 > This delay function comes in handy in between of repetitive http calls to avoid hammering the server. The default waiting time is 100ms but may be modified by a constructor option.
-
-#### Example
-
-Please refer to [this Github script](https://github.com/NeonWilderness/tdalien/blob/master/utils/userStatus.js#L25-L31) for an example of using *delayNextPromise()*.
 <hr>
 
 ### Returns the appropriate platform blog url
@@ -65,7 +61,7 @@ url | string | an abitrary (Twoday) URL
 
 - returns: url complemented with https protocol as string
 
-> Twoday utilizes schemeless URLs which frequently raises issues with http node modules such as *got*. This helper function makes sure, the URL has a leading protocol.
+> Twoday utilizes schemeless URLs which sometimes raises issues with http node modules such as *got*. This helper function makes sure, the URL has a leading protocol.
 
 #### Example
 ```

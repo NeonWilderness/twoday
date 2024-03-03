@@ -131,7 +131,7 @@ const story = {
   action: 'publish'
 };
 const res = await td.createStory('neonwilderness', story);
-console.log(`Story "${story.niceurl}" successfully created (code=${response.statusCode}).`);
+console.log(`Story "${story.niceurl}" successfully created (code=${res.statusCode}).`);
 ```
 <hr>
 
@@ -175,7 +175,7 @@ const story = {
   topic: 'New York'
 };
 const res = await td.updateStory('neonwilderness', story);
-console.log(`Story "${story.id}" successfully updated (code=${response.statusCode}).`);
+console.log(`Story "${story.id}" successfully updated (code=${res.statusCode}).`);
 ```
 <hr>
 

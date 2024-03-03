@@ -122,9 +122,11 @@ layout? | string | an existing layout name of this alias
 
 > tImageID is the resulting name tag for the image, either defined by tImageInfo.alias or derived by the system. If the same image name already exists, a new entry will be created and a sequential number will be added to tImageID (starting with "0"). It is strongly recommended to always check/use the returned tImageID as this may differ from the originally intended image name.
 
-> If the file does already exist, a copy will be created.
+> If the image does already exist, a copy will be created.
 
 > If param "layout" is passed, the image will instead be added to this layout as a layout image. When creating a layout image, the params "topic" and "addToTopic" will be ignored.
+
+> Refer to the *getActiveLayoutName* API call to get the name of the active layout. Check *getLayoutNames* to get a list of all existing layout names on a blog.
 
 #### Example: Create a new image with the name "baum2" on blog alias *neonwilderness* as part of photo album "My tree images"
 ```

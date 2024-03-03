@@ -191,7 +191,7 @@ skin? | string | a skin's new content
 - requires: successful login
 - returns: http post response
 
-#### Example: Update the title of skin *Site.style* of blog alias *neonwilderness*
+#### Example: Create a new skin *Site.myNewSkin* within *neonwilderness* alias
 ```
 const td = new Twoday.Twoday('prod');
 await td.login();
@@ -213,7 +213,7 @@ skinName | string | the skin's qualifier, e.g. *Site.obsolete*
 - requires: successful login
 - returns: http post response
 
-> A skin will only be deleted if it is a modified or custom skin!
+> A skin will only be deleted if it is a modified standard skin or a custom skin!
 
 #### Example: Delete skin *Site.obsolete* of blog alias *neonwilderness*
 ```
