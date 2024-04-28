@@ -83,6 +83,7 @@ tMember Property | Type | Text
 alias | string | the member's alias
 role | string | the member's role, i.e. 'Owner', 'Administrator', 'Contentmanager', 'Contributor', 'Subscriber'
 url | string | the member's url, e.g. blog url or mail adress; may be empty as well
+member | string | the member's id number or empty string
 
 #### Example: Get all members of the neonwilderness blog
 ```

@@ -10,11 +10,11 @@ describe('Can instantiate a valid Twoday class', () => {
     expect(td.baseUrl).toBe('https://twoday.net');
     expect(typeof td.layout).toBe('object');
     expect(Object.keys(td.layout)).toHaveLength(0);
-    expect(td.delay).toBe(20);
+    expect(td.delay).toBe(100);
     expect(td.silent).toBeFalsy();
     const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
     expect(c.key).toBe('agreed');
-    expect(c.value).toBe('20190210a');
+    expect(c.value).toBe('20240210a');
     expect(c.domain).toBe('twoday.net');
     expect(c.secure).toBeTruthy();
   });
@@ -26,11 +26,11 @@ describe('Can instantiate a valid Twoday class', () => {
     expect(td.baseUrl).toBe('https://twoday-test.net');
     expect(typeof td.layout).toBe('object');
     expect(Object.keys(td.layout)).toHaveLength(0);
-    expect(td.delay).toBe(20);
+    expect(td.delay).toBe(100);
     expect(td.silent).toBeTruthy();
     const c = td.cookieJar.getCookiesSync(td.baseUrl)[0];
     expect(c.key).toBe('agreed');
-    expect(c.value).toBe('20190210a');
+    expect(c.value).toBe('20240210a');
     expect(c.domain).toBe('twoday-test.net');
     expect(c.secure).toBeTruthy();
   });
@@ -117,12 +117,14 @@ describe('Can instantiate a valid Twoday class', () => {
         expect(members.length).toBeGreaterThan(0);
         for (let tMember of members) {
           const tMemberKeys = Object.keys(tMember);
-          expect(tMemberKeys).toHaveLength(3);
+          expect(tMemberKeys).toHaveLength(4);
           expect(tMemberKeys).toContain('alias');
           expect(tMemberKeys).toContain('role');
           expect(tMemberKeys).toContain('url');
+          expect(tMemberKeys).toContain('member');
           expect(tMember.alias).toBeTruthy();
           expect(tMember.role).toMatch(/^(Owner|Administrator|Contentmanager|Contributor|Subscriber)/);
+          if (tMember.member) expect(isNaN(tMember.member)).toBe(false);
         }
       });
   });

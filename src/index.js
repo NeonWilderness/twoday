@@ -259,7 +259,9 @@ class Twoday {
           const role = $$el.find('span').eq(0).text().split(': ')[1];
           const alias = $$el.find('h4').text();
           const url = this.fixURL($$el.find('p>a').attr('href') || '');
-          return { alias, role, url };
+          const memberUrl = $$el.next().find('li:first>a').attr('href') || '';
+          const member = memberUrl ? memberUrl.match(/members\/(\d+)/)[1] : '';
+          return { alias, role, url, member };
         })
         .get();
 
