@@ -203,6 +203,7 @@ class Twoday {
 
       const $ = cheerio.load(response.body);
       let adminBlogs = [];
+      const aliasMatcher = new RegExp(`\\/\\/(.*?)\\.${this.fullDomain}`);
       $('.listItem').each((_index, el) => {
         let $el = $(el);
         let authLevel = $el
@@ -215,7 +216,7 @@ class Twoday {
               .find('.listItemRight a')
               .eq(0)
               .attr('href')
-              .match(/\/\/(.*?)\.twoday\./)[1]
+              .match(aliasMatcher)[1]
           );
         }
       });
@@ -769,7 +770,11 @@ class Twoday {
         })
       );
       if (!this.silent)
-        console.log(`${layout ? 'Layout ' : ''}Image "${alias}/${imgName}" successfully created (statusCode=${response.statusCode}).`);
+        console.log(
+          `${layout ? 'Layout ' : ''}Image "${alias}/${imgName}" successfully created (statusCode=${
+            response.statusCode
+          }).`
+        );
       const $ = cheerio.load(response.body);
       return $('td>b').eq(0).text();
     } catch (err) {
