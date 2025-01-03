@@ -136,7 +136,7 @@ const data = {
   alias: 'baum2',
   url: 'https://myimages.domain.com/baum2.jpg',
   topic: 'My tree images'
-}
+};
 const imgID = await td.createImage('neonwilderness', data);
 console.log(`Image ID "${imgID}" successfully created!`);
 ```
@@ -149,7 +149,7 @@ const data = {
   alias: 'bg',
   path: path.resolve(process.cwd(), 'local/bg.jpg'),
   layout: 'default'
-}
+};
 await td.createImage('recycle', data);
 console.log(`Layout Image ID "${data.alias}" successfully created!`);
 ```

@@ -103,7 +103,7 @@ const s = await td.isModifiedSkin(alias, skinName);
 if (s.isModified) {
   const data = await td.getSkin({ name: skinName, url: s.url});
   console.log(data.skin);
-}
+};
 ```
 <hr>
 

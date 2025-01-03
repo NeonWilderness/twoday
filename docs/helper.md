@@ -109,7 +109,7 @@ Example results in:
 {
   valid: false,
   prototype: 'hopsy',
-  name: 'display
+  name: 'display'
 }
 ```
 <hr>
