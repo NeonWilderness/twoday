@@ -38,11 +38,12 @@ class Twoday {
     this.version = pkg.version;
 
     const cookie = tough.Cookie;
-    const agreed = cookie.parse(
+    const content = cookie.parse(
       `agreed=${options.agreedVersion}; Domain=.${this.fullDomain}; Path=/; SameSite=None; Secure;`
     );
     this.cookieJar = new tough.CookieJar();
-    this.cookieJar.setCookieSync(agreed, this.baseUrl);
+    this.cookieJar.setCookieSync(content, this.baseUrl);
+    
     this.got = got.extend({
       allowGetBody: true,
       cookieJar: this.cookieJar,
@@ -145,6 +146,14 @@ class Twoday {
 
       if (!this.#checkLoggedIn()) throw new Error('Invalid cookies!');
       if (!this.silent) console.log(`Login to ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
+
+      if (process.env.COOKIENAME) {
+        const cookie = tough.Cookie;
+        const addon = cookie.parse(
+          `${process.env.COOKIENAME}=${process.env.COOKIEVALUE}; Domain=.${this.fullDomain}; Path=/; SameSite=None; Secure;`
+        );
+        this.cookieJar.setCookieSync(addon, this.baseUrl);
+      }
       return response;
     } catch (err) {
       this.#handleError(`${this.fullDomain} login failed`, err, cThrowAndExit);
@@ -231,7 +240,8 @@ class Twoday {
     try {
       this.#checkLoggedIn();
 
-      const resUrl = `${this.getAliasDomain(alias)}/${hoptype}/?page=`;
+      const domain = alias === 'www' ? this.baseUrl : this.getAliasDomain(alias);
+      const resUrl = `${domain}/${hoptype}?page=`;
       let response = await this.delayed(this.got.get(`${resUrl}0`));
       let $ = cheerio.load(response.body);
       let allItems = returnItemsOnPage($);
@@ -1056,6 +1066,46 @@ class Twoday {
       return true;
     } catch (err) {
       this.#handleError(`Error while downloading layout "${alias}/${layout.name}"`, err, cThrowAndExit);
+    }
+  }
+
+  async getSysMgrUsers(pattern) {
+
+    const returnUsers = $ => {
+      return $('.sysmgrListitem').toArray().map(el => {
+        const s = $(el).find('strong');
+        const username = s.text();
+        const a = s.find('a');
+        const url = a.length ? a.attr('href') : '';
+        return { username, url };
+      });
+    }
+
+    try {
+      if (typeof process.env.COOKIENAME === 'undefined' || typeof process.env.COOKIEVALUE === 'undefined')
+        this.#handleError('Insufficient authorization', null, cThrowAndExit);
+
+      const url = `${this.baseUrl}/manage/users`;
+      let response = await this.delayed(this.got.get(url));
+
+      response = await this.delayed(
+        this.got.post(url, {
+          form: {
+            secretKey: this.#getSecretKey(response.body),
+            show: 'localUsers',
+            sort: 'username',
+            order: 'asc',
+            column: 'username',
+            keywordIsA: 'substring',
+            keyword: pattern,
+            search: 'Anzeigen'
+          }
+        })
+      );
+
+      return await this.#fetchItems('www', 'manage/users', returnUsers);
+    } catch (err) {
+      this.#handleError(`${this.fullDomain} sysmgr access failed`, err, cThrowAndExit);
     }
   }
 
