@@ -491,7 +491,7 @@ class Twoday {
       this.#validateOptions(options);
 
       const { isModified, url } = await this.isModifiedSkin(alias, skinName);
-      if (!isModified) return createSkin(alias, skinName, options);
+      if (!isModified) return this.createSkin(alias, skinName, options);
 
       const oldSkin = await this.getSkin({
         name: skinName,
