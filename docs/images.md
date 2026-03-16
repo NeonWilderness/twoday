@@ -7,12 +7,13 @@
 > *Please be aware, that the code examples below are very condensed and intentionally omit the recommended try..catch construct as well as the async framing.*
 <hr>
 
-### Get a list of images
-#### .listImages(alias: string) : Promise&lt;tResourceInfo[]&gt;
+### Get a list of (layout) images
+#### .listImages(alias: string, layout?: string) : Promise&lt;tResourceInfo[]&gt;
 
 Param | Type | Text
 --- | --- | --- 
 alias | string | a blog's alias
+layout? | string | layout name or null
 
 - requires: successful login
 - returns: array of tResourceInfo
@@ -22,6 +23,8 @@ tResourceInfo Property | Type | Text
 name | string | the image's name
 mime | string | the image's mime type 
 url | string | the image's url
+
+> If a layout name is passed, a list of current layout images will be returned.
 
 > This is a syntactic sugar function to the generic info provider function *[listItems()](./docs/helper.md#get-a-list-of-files-or-images)*.
 
@@ -34,15 +37,27 @@ const resInfos = await td.listImages(alias);
 console.log(`Blog "${alias}" features the following jpg images:`);
 console.log(resInfos.filter(img => img.mime === 'jpg'));
 ```
+
+#### Example: List all layout images of blog alias 'foundation'
+```
+const td = new Twoday.Twoday('prod');
+await td.login();
+const alias = 'foundation';
+const layout = 'twoday30';
+const resInfos = await td.listImages(alias, layout);
+console.log(`Layout ${layout} of blog "${alias}" features the following images:`);
+console.log(resInfos);
+```
 <hr>
 
 ### Check if a specific image does exist on a blog alias
-#### .hasImage(alias: string, imgName: string): Promise&lt;boolean&gt;
+#### .hasImage(alias: string, imgName: string, layout?: string): Promise&lt;boolean&gt;
 
 Param | Type | Text
 --- | --- | --- 
 alias | string | the blog's alias
 imgName | string | a file name tag
+layout? | string | layout name or null
 
 - requires: successful login
 - returns: boolean
@@ -53,6 +68,14 @@ const td = new Twoday.Twoday('prod');
 await td.login();
 const hasSelfie = await td.hasImage('neonwilderness', 'mySelfie');
 console.log(`File mySelfie does ${hasSelfie ? '' : 'not '}exist.`)
+```
+
+#### Example: Check if a "header" image exists on the foundation blog
+```
+const td = new Twoday.Twoday('prod');
+await td.login();
+const hasHeader = await td.hasImage('neonwilderness', 'header', 'twoday30');
+console.log(`File header does ${hasHeader ? '' : 'not '}exist.`)
 ```
 <hr>
 
@@ -72,11 +95,14 @@ url? | string | an image url
 resizeto? | tResizeTo | 'max', 'crop', 'scale', 'exact' or 'no'
 width? | string | target width (used if resizeto !== 'no')
 height? | string | target height (used if resizeto !== 'no')
+layout? | string | layout name or null
 
 - requires: successful login
 - returns: tImageID string (alias)
 
 > Defaults are resizeto='no' and width/height=400.
+
+> If layout is passed, the image will be updated on the layout instead.
 
 #### Example: Update an image 'baum1' on blog alias *neonwilderness*
 ```
@@ -150,21 +176,24 @@ const data = {
   path: path.resolve(process.cwd(), 'local/bg.jpg'),
   layout: 'default'
 };
-await td.createImage('recycle', data);
-console.log(`Layout Image ID "${data.alias}" successfully created!`);
+const imgID = await td.createImage('recycle', data);
+console.log(`Layout Image ID "${imgID}" successfully created!`);
 ```
 <hr>
 
 ### Delete an image
-#### .deleteImage(alias: string, imgName: string): Promise&lt;Response&gt;
+#### .deleteImage(alias: string, imgName: string, layout?: string): Promise&lt;Response&gt;
 
 Param | Type | Text
 --- | --- | --- 
 alias | string | the blog's alias
 imgName | string | an image name tag
+layout? | string | layout name or null
 
 - requires: successful login
 - returns: http post response
+
+> If param "layout" contains a layout name, the image will be deleted from the layout instead.
 
 #### Example: Delete an image ID 'baum3' on blog 'neonwilderness'
 ```
@@ -172,4 +201,11 @@ const td = new Twoday.Twoday('prod');
 await td.login();
 const alias = 'neonwilderness';
 await td.deleteImage(alias, 'baum3');
+```
+
+#### Example: Delete a layout image 'success_kid' from layout 'greyboxes' on blog 'mmm'
+```
+const td = new Twoday.Twoday('prod');
+await td.login();
+await td.deleteImage('mmm', 'success_kid', 'greyboxes');
 ```

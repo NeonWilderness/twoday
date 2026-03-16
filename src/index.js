@@ -43,7 +43,7 @@ class Twoday {
     );
     this.cookieJar = new tough.CookieJar();
     this.cookieJar.setCookieSync(content, this.baseUrl);
-    
+
     this.got = got.extend({
       allowGetBody: true,
       cookieJar: this.cookieJar,
@@ -220,13 +220,7 @@ class Twoday {
           .text()
           .match(/Status: (.*)\s/)[1];
         if (authLevel === 'Owner' || authLevel === 'Administrator') {
-          adminBlogs.push(
-            $el
-              .find('.listItemRight a')
-              .eq(0)
-              .attr('href')
-              .match(aliasMatcher)[1]
-          );
+          adminBlogs.push($el.find('.listItemRight a').eq(0).attr('href').match(aliasMatcher)[1]);
         }
       });
 
@@ -583,7 +577,7 @@ class Twoday {
   }
 
   async listItems(alias, resType) {
-    const returnResources = $$ =>
+    const returnMainResources = $$ =>
       $$('.leftCol')
         .map((_i, el) => {
           const $$el = $$(el);
@@ -595,9 +589,24 @@ class Twoday {
         })
         .get();
 
+    const returnLayoutImages = $$ =>
+      $$('.listItemLeft')
+        .map((_i, el) => {
+          const $$el = $$(el);
+          const name = $$el.find('h4').text();
+          const mime = $$el.text().split('/')[1].split(', ')[0].split('-').pop().trim();
+          const url = this.fixURL($$el.find('p>a').attr('href').slice(0,-5));
+          return { name, mime, url };
+        })
+        .get();
+
     try {
-      if (!['files', 'images'].includes(resType)) throw new Error('Param "resType" must be "files" or "images".');
-      return await this.#fetchItems(alias, resType, returnResources);
+      const resParts = resType.split('/');
+      const resValid = (resParts.length === 1 && ['files', 'images'].includes(resType)) ||
+        (resParts.length === 4 && resParts[0] === 'layouts' && resParts[2] === 'images');
+      if (!resValid) throw new Error('Param "resType" must be "files" or "images".');
+      const cb = resParts[0] === 'layouts' ? returnLayoutImages : returnMainResources;
+      return await this.#fetchItems(alias, resType, cb);
     } catch (err) {
       this.#handleError(`Error while getting the list of "${resType}" for "${alias}"`, err, cThrowAndExit);
     }
@@ -658,8 +667,10 @@ class Twoday {
           }
         })
       );
-      if (!this.silent)
-        console.log(`File "${alias}/${resName}" successfully deleted (statusCode=${response.statusCode}).`);
+      if (!this.silent) {
+        const layout = resType.startsWith('layouts') ? ` from layout "${resType.split('/')[1]}"` : '';
+        console.log(`File "${alias}/${resName}" successfully deleted ${layout} (statusCode=${response.statusCode}).`);
+      }
       return response;
     } catch (err) {
       this.#handleError(`Error while deleting ${resType.slice(0, -1)} "${alias}/${resName}"`, err, cThrowAndExit);
@@ -724,16 +735,19 @@ class Twoday {
     }
   }
 
-  async listImages(alias) {
-    return await this.listItems(alias, 'images');
+  async listImages(alias, layout = '') {
+    const imgType = layout ? `layouts/${layout}/images/all` : 'images';
+    return await this.listItems(alias, imgType);
   }
 
-  async hasImage(alias, imgName) {
-    return await this.hasItem(alias, 'images', imgName);
+  async hasImage(alias, imgName, layout = '') {
+    const imgType = layout ? `layouts/${layout}/images` : 'images';
+    return await this.hasItem(alias, imgType, imgName);
   }
 
-  async deleteImage(alias, imgName) {
-    return await this.deleteItem(alias, 'images', imgName);
+  async deleteImage(alias, imgName, layout = '') {
+    const imgType = layout ? `layouts/${layout}/images` : 'images';
+    return await this.deleteItem(alias, imgType, imgName);
   }
 
   async createImage(alias, image) {
@@ -802,7 +816,8 @@ class Twoday {
         url: '',
         resizeto: 'no',
         width: '400',
-        height: '400'
+        height: '400',
+        layout: ''
       };
       const param = Object.assign(defaults, image);
       const imgAlias = param.alias || '';
@@ -811,7 +826,8 @@ class Twoday {
       if (!imgAlias) throw new Error('Image alias is missing!');
       if (!param.path && !param.url) throw new Error('Replacing image must have an image file path or an URL!');
 
-      const replaceUrl = `${this.getAliasDomain(alias)}/images/${imgAlias}/replace`;
+      const layout = param.layout ? `/layouts/${param.layout}` : '';
+      const replaceUrl = `${this.getAliasDomain(alias)}${layout}/images/${imgAlias}/replace`;
       let response = await this.delayed(this.got.get(replaceUrl));
 
       const form = new FormData();
@@ -1070,16 +1086,17 @@ class Twoday {
   }
 
   async getSysMgrUsers(pattern) {
-
     const returnUsers = $ => {
-      return $('.sysmgrListitem').toArray().map(el => {
-        const s = $(el).find('strong');
-        const username = s.text();
-        const a = s.find('a');
-        const url = a.length ? a.attr('href') : '';
-        return { username, url };
-      });
-    }
+      return $('.sysmgrListitem')
+        .toArray()
+        .map(el => {
+          const s = $(el).find('strong');
+          const username = s.text();
+          const a = s.find('a');
+          const url = a.length ? a.attr('href') : '';
+          return { username, url };
+        });
+    };
 
     try {
       if (typeof process.env.COOKIENAME === 'undefined' || typeof process.env.COOKIEVALUE === 'undefined')

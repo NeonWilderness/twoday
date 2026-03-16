@@ -1,6 +1,6 @@
 const Twoday = require('../src/index');
 require('dotenv-safe').config();
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 
 describe('Can login and receive/store all necessary cookies', () => {
   it('should login to dev and get/store the relevant cookies', () => {

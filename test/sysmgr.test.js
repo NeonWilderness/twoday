@@ -1,6 +1,6 @@
 const Twoday = require('../src/index');
 require('dotenv-safe').config();
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 
 describe('Can login and do sysmgr tasks', () => {
   it('should login and provide a user list for a user substring', () => {

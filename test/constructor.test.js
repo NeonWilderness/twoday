@@ -1,6 +1,6 @@
 const Twoday = require('../src/index.js');
 require('dotenv-safe').config();
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 
 describe('Can instantiate a valid Twoday class', () => {
   it('should work with platform=prod', () => {

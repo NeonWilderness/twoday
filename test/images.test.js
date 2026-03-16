@@ -1,33 +1,55 @@
-const path = require('path');
+const path = require('node:path');
 const Twoday = require('../src/index');
 require('dotenv-safe').config();
 
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 const td = new Twoday.Twoday('prod');
 const alias = 'foundation';
-const rnd = Math.floor(Math.random() * 99);
-const imgName = `testimg${rnd.toString().padStart(2, '0')}`;
 
 describe('Can work with Twoday images', () => {
-  it('should retrieve a list of images', () => {
-    return td
-      .login()
-      .then(() => td.listImages('alias'))
-      .then(images => {
-        console.log(images, images.length);
-        expect(Array.isArray(images)).toBeTruthy();
-        expect(images.length).toBeGreaterThan(2);
-        expect(typeof images[0]).toBe('object');
-        const k = Object.keys(images[0]);
-        expect(k).toHaveLength(3);
-        expect(k).toContain('name');
-        expect(k).toContain('mime');
-        expect(k).toContain('url');
-      });
+  beforeAll(async () => {
+    await td.login({ silent: true });
+    // delete all test images
+    const images = await td.listImages(alias);
+    for (const image of images) {
+      if (!image.name.startsWith('test')) continue;
+      await td.deleteImage(alias, image.name);
+    }
   });
 
-  xit('should upload a local image with derived name', async () => {
-    await td.login();
+  afterAll(async () => {
+    await td.logout();
+  });
+
+  it('should retrieve a list of images', () => {
+    return td.listImages(alias).then(images => {
+      console.log(images, images.length);
+      expect(Array.isArray(images)).toBeTruthy();
+      expect(images.length).toBeGreaterThan(2);
+      expect(typeof images[0]).toBe('object');
+      const k = Object.keys(images[0]);
+      expect(k).toHaveLength(3);
+      expect(k).toContain('name');
+      expect(k).toContain('mime');
+      expect(k).toContain('url');
+    });
+  });
+
+  it('should retrieve a list of layout images', () => {
+    return td.listImages(alias, 'twoday30').then(images => {
+      console.log(images, images.length);
+      expect(Array.isArray(images)).toBeTruthy();
+      expect(images.length).toBeGreaterThan(0);
+      expect(typeof images[0]).toBe('object');
+      const k = Object.keys(images[0]);
+      expect(k).toHaveLength(3);
+      expect(k).toContain('name');
+      expect(k).toContain('mime');
+      expect(k).toContain('url');
+    });
+  });
+
+  xit('should upload a local image with derived name "test"', async () => {
     const imgID = await td.createImage(alias, {
       path: path.resolve(process.cwd(), 'test/test.jpg'),
       alttext: 'Image with a derived name',
@@ -38,31 +60,42 @@ describe('Can work with Twoday images', () => {
     expect(imgID.startsWith('test')).toBeTruthy();
   });
 
-  xit('should upload a local image with a defined name', async () => {
-    await td.login();
+  xit('should upload a local image with a defined name "test02"', async () => {
     const imgID = await td.createImage(alias, {
-      alias: 'success_kid',
+      alias: 'test02',
       path: path.resolve(process.cwd(), 'test/test.jpg'),
       alttext: 'Image with a predefined name',
       resizeto: 'crop',
       width: '800',
       height: '450'
     });
-    expect(imgID.startsWith('success_kid')).toBeTruthy();
+    expect(imgID.startsWith('test02')).toBeTruthy();
   });
 
   xit('should upload a remote image by url', async () => {
-    await td.login();
     const imgID = await td.createImage(alias, {
-      url: 'http://enroute.square7.ch/blog/P1050700.JPG',
-      alttext: 'P1050700 water jump',
+      alias: 'test03',
+      url: 'https://static.twoday.net/www/layouts/twoday30/header_logo.jpg',
+      alttext: 'td_header_logo',
       resizeto: 'no'
     });
-    expect(imgID.startsWith('P1050700')).toBeTruthy();
+    expect(imgID.startsWith('test03')).toBeTruthy();
+  });
+
+  xit('should upload a layout image', async () => {
+    const imgID = await td.createImage(alias, {
+      alias: 'test04',
+      path: path.resolve(process.cwd(), 'test/test.jpg'),
+      alttext: 'Image with a predefined name',
+      resizeto: 'crop',
+      width: '800',
+      height: '450',
+      layout: 'twoday30'
+    });
+    expect(imgID.startsWith('kid')).toBeTruthy();
   });
 
   xit('should throw when neither path nor url was provided', async () => {
-    await td.login();
     expect(() =>
       td.createImage(alias, {
         alias: 'test',

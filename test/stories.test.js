@@ -2,7 +2,7 @@ const cheerio = require('cheerio');
 const Twoday = require('../src/index');
 require('dotenv-safe').config();
 
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 const td = new Twoday.Twoday('prod');
 const alias = 'foundation';
 

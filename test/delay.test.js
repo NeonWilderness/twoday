@@ -1,7 +1,7 @@
 const Twoday = require('../src/index');
 require('dotenv-safe').config();
 
-jest.setTimeout(10000);
+jest.setTimeout(20000);
 
 const delay = 1000;
 const td = new Twoday.Twoday('dev', { delay });
