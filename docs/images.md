@@ -70,7 +70,7 @@ const hasSelfie = await td.hasImage('neonwilderness', 'mySelfie');
 console.log(`File mySelfie does ${hasSelfie ? '' : 'not '}exist.`)
 ```
 
-#### Example: Check if a "header" image exists on the foundation blog
+#### Example: Check if a "header" layout image exists on the foundation blog
 ```
 const td = new Twoday.Twoday('prod');
 await td.login();
