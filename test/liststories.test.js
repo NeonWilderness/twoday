@@ -2,7 +2,7 @@ const Twoday = require('../src/index');
 require('dotenv-safe').config();
 
 jest.setTimeout(20000);
-const td = new Twoday.Twoday('prod', { delay: 300 });
+const td = new Twoday.Twoday('prod', { delay: 100 });
 const alias = 'oman2010';
 
 describe('Can provide a list of Twoday stories', () => {

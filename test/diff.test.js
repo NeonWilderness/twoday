@@ -2,8 +2,11 @@ const Twoday = require('../src/index.js');
 
 const td = new Twoday.Twoday('prod', { silent: true });
 describe('Can diff skins', () => {
-  xit('should throw an error upon wrong fields in skin param', () => {
-    expect(() => td.diffSkin('Site.anything', { desc: '' }, {})).toThrow();
+  it('should throw an error upon wrong fields in skin param', () => {
+    const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+    td.diffSkin('Site.anything', { desc: '' }, {});
+    expect(mockExit).toHaveBeenCalledWith(1);
+    mockExit.mockRestore();
   });
 
   it('should diff title/description', () => {

@@ -6,8 +6,11 @@ const td = new Twoday.Twoday('dev', { silent: true });
 const alias = 'neonwilderness';
 
 describe('Can work with Twoday skins', () => {
-  it('should throw when login is missing', () => {
-    return expect(() => td.getModifiedSkins(alias)).rejects.toThrow();
+  it('should exit when login is missing', async () => {
+    const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+    await td.getModifiedSkins(alias);
+    expect(mockExit).toHaveBeenCalledWith(1);
+    mockExit.mockRestore();
   });
 
   it('should return a modified skins array', () => {

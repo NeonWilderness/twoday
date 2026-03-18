@@ -54,12 +54,9 @@ class Twoday {
   }
 
   #checkLoggedIn() {
-    try {
-      const cookies = this.cookieJar.serializeSync().cookies;
-      return cookies[2].key === 'avLoggedIn' && cookies[2].value === '1';
-    } catch (err) {
-      this.#handleError('Must login before!');
-    }
+    const cookies = this.cookieJar.serializeSync().cookies;
+    if (cookies.filter(cookie => cookie.key === 'avLoggedIn' && cookie.value === '1').length === 0)
+      this.#handleError('Invalid cookies - Must login before!', null, cThrowAndExit);
   }
 
   delayNextPromise() {
@@ -144,7 +141,7 @@ class Twoday {
         })
       );
 
-      if (!this.#checkLoggedIn()) throw new Error('Invalid cookies!');
+      this.#checkLoggedIn();
       if (!this.silent) console.log(`Login to ${this.fullDomain} successful (statusCode=${response.statusCode}).`);
 
       if (process.env.COOKIENAME) {
@@ -290,7 +287,7 @@ class Twoday {
         })
         .get();
     } catch (err) {
-      this.#handleError(`getModifiedSkins from "${prefixUrl}" failed`, err, cThrowAndExit);
+      this.#handleError(`getModifiedSkins from alias "${alias}" failed`, err, cThrowAndExit);
     }
   }
 
@@ -595,14 +592,15 @@ class Twoday {
           const $$el = $$(el);
           const name = $$el.find('h4').text();
           const mime = $$el.text().split('/')[1].split(', ')[0].split('-').pop().trim();
-          const url = this.fixURL($$el.find('p>a').attr('href').slice(0,-5));
+          const url = this.fixURL($$el.find('p>a').attr('href').slice(0, -5));
           return { name, mime, url };
         })
         .get();
 
     try {
       const resParts = resType.split('/');
-      const resValid = (resParts.length === 1 && ['files', 'images'].includes(resType)) ||
+      const resValid =
+        (resParts.length === 1 && ['files', 'images'].includes(resType)) ||
         (resParts.length === 4 && resParts[0] === 'layouts' && resParts[2] === 'images');
       if (!resValid) throw new Error('Param "resType" must be "files" or "images".');
       const cb = resParts[0] === 'layouts' ? returnLayoutImages : returnMainResources;
@@ -735,17 +733,25 @@ class Twoday {
     }
   }
 
+  #validateLayout(alias, layout) {
+    if (this.getLayoutNames(alias).includes(layout)) return;
+    this.#handleError(`No such layout "${layout}" in blog "${alias}"`, null, cThrowAndExit);
+  }
+
   async listImages(alias, layout = '') {
+    if (layout) this.#validateLayout(alias, layout);
     const imgType = layout ? `layouts/${layout}/images/all` : 'images';
     return await this.listItems(alias, imgType);
   }
 
   async hasImage(alias, imgName, layout = '') {
+    if (layout) this.#validateLayout(alias, layout);
     const imgType = layout ? `layouts/${layout}/images` : 'images';
     return await this.hasItem(alias, imgType, imgName);
   }
 
   async deleteImage(alias, imgName, layout = '') {
+    if (layout) this.#validateLayout(alias, layout);
     const imgType = layout ? `layouts/${layout}/images` : 'images';
     return await this.deleteItem(alias, imgType, imgName);
   }
@@ -770,6 +776,7 @@ class Twoday {
       if (!param.path && !param.url) throw new Error('New image must have an image file path or an URL!');
       const imgName = param.alias || (param.path || param.url).split('/').pop();
 
+      if (param.layout) this.#validateLayout(param.alias, param.layout);
       const layout = param.layout ? `/layouts/${param.layout}` : '';
       const createUrl = `${this.getAliasDomain(alias)}${layout}/images/create`;
       let response = await this.delayed(this.got.get(createUrl));
@@ -826,6 +833,7 @@ class Twoday {
       if (!imgAlias) throw new Error('Image alias is missing!');
       if (!param.path && !param.url) throw new Error('Replacing image must have an image file path or an URL!');
 
+      if (param.layout) this.#validateLayout(param.alias, param.layout);
       const layout = param.layout ? `/layouts/${param.layout}` : '';
       const replaceUrl = `${this.getAliasDomain(alias)}${layout}/images/${imgAlias}/replace`;
       let response = await this.delayed(this.got.get(replaceUrl));
