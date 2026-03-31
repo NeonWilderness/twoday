@@ -178,7 +178,7 @@ class Twoday {
       const codeUrl = 'https://gitlab.com/api/v4/projects/8966097/repository/tree?path=code&per_page=100';
       const body = await this.got.get(codeUrl).json();
       this.validHoptypes = body.reduce((all, item) => {
-        if (item.type === 'tree') all.push(item.name.toLowerCase());
+        if (item.type === 'tree') all.push(item.name);
         return all;
       }, []);
       return this.validHoptypes;
@@ -190,9 +190,10 @@ class Twoday {
   async isValidHoptype(skinName) {
     const hoptypes = await this.getValidHoptypes();
     const skinHoptype = skinName.split('.')[0].toLowerCase();
+    const index = hoptypes.findIndex(hoptype => hoptype.toLowerCase() === skinHoptype);
     return {
-      valid: hoptypes.includes(skinHoptype),
-      prototype: skinHoptype,
+      valid: index >= 0,
+      prototype: index >= 0 ? hoptypes[index] : skinHoptype,
       name: skinName.slice(skinHoptype.length + 1)
     };
   }

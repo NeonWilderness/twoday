@@ -31,13 +31,20 @@ describe('Provides working helper functions', () => {
     expect(result.valid).toBeFalsy();
     expect(result.prototype).toBe('hopsy');
     expect(result.name).toBe('display');
-    result = await td.isValidHoptype('Site.page');
+
+    result = await td.isValidHoptype('site.page');
     expect(result.valid).toBeTruthy();
-    expect(result.prototype).toBe('site');
+    expect(result.prototype).toBe('Site');
     expect(result.name).toBe('page');
+
+    result = await td.isValidHoptype('membermgr.statusloggedin');
+    expect(result.valid).toBeTruthy();
+    expect(result.prototype).toBe('MemberMgr');
+    expect(result.name).toBe('statusloggedin');
+
     result = await td.isValidHoptype('StOrY.editForm');
     expect(result.valid).toBeTruthy();
-    expect(result.prototype).toBe('story');
+    expect(result.prototype).toBe('Story');
     expect(result.name).toBe('editForm');
   });
 
