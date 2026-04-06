@@ -167,9 +167,9 @@ export declare class Twoday {
   updateFile(alias: string, file: tFileInfo): Promise<tFileID>;
   downloadFiles(alias: string, path: string): void;
   // images
-  listImages(alias: string): Promise<tResourceInfo[]>;
-  hasImage(alias: string, imgName: string): Promise<boolean>;
-  deleteImage(alias: string, imgName: string): Promise<Response>;
+  listImages(alias: string, layout?: string): Promise<tResourceInfo[]>;
+  hasImage(alias: string, imgName: string, layout?: string): Promise<boolean>;
+  deleteImage(alias: string, imgName: string, layout?: string): Promise<Response>;
   createImage(alias: string, image: tImageInfo): Promise<tImageID>;
   updateImage(alias: string, image: tImageInfo): Promise<tImageID>;
   downloadImages(alias: string, path: string): void;
@@ -183,6 +183,7 @@ export declare class Twoday {
   getStoryTopics(alias: string): Promise<tNameUrl[]>;
   // layout
   #getLayoutData(alias: string): Promise<tLayoutData>;
+  #validateLayout(alias:string, layout: string): void;
   getLayout(alias: string, refresh?: boolean): Promise<tLayoutData>;
   getActiveLayoutUrl(alias: string): Promise<string>;
   getActiveLayoutName(alias: string): Promise<string>;
