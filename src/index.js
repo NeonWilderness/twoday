@@ -295,12 +295,13 @@ class Twoday {
   async isModifiedSkin(alias, skinName) {
     try {
       const result = await this.isValidHoptype(skinName);
+      const resProto = result.prototype.toLowerCase();
       const modifiedSkins = await this.getModifiedSkins(alias);
 
       const filtered = modifiedSkins.filter(skin => {
         const prototype = skin.name.split('.')[0].toLowerCase();
         const name = skin.name.slice(prototype.length + 1);
-        return result.prototype === prototype && result.name === name;
+        return resProto === prototype && result.name === name;
       });
 
       result.isModified = !!filtered.length;

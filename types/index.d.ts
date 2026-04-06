@@ -141,7 +141,7 @@ export declare class Twoday {
   getMembers(): Promise<tMember[]>;
   // helper
   delayNextPromise(): Promise<void>;
-  delayed(gotPromise: Promise): Promise<any>;
+  delayed(gotPromise: Promise<any>): Promise<any>;
   fixURL(url: string): string;
   getAliasDomain(alias: string): string;
   getStaticUrl(alias: string, resType: tResType): string;
