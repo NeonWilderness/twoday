@@ -1190,6 +1190,71 @@ class Twoday {
       this.#handleError(`Error while getting infos of "${alias}"`, err, cThrowAndExit);
     }
   }
+
+  async getSidebarModules(alias) {
+    try {
+      this.#checkLoggedIn();
+
+      const response = await this.delayed(this.got.get(`${this.getAliasDomain(alias)}/modules/order`));
+      const $ = cheerio.load(response.body);
+      const sidebarModules = {
+        sidebar01: [],
+        sidebar02: []
+      };
+
+      const options = $('.grid-bg option');
+      if (!options) return sidebarModules;
+
+      options.each((_i, el) => {
+        const id = el.parent.attribs.id.slice(0, 9); // e.g. sidebar01Chooser => sidebar01
+        sidebarModules[id].push(el.attribs.value);
+      });
+
+      return sidebarModules;
+    } catch (err) {
+      this.#handleError(`Error while reading sidebar modules of "${alias}"`, err, cThrowAndExit);
+    }
+  }
+
+  async getFreeTextModule(alias, module) {
+    try {
+      this.#checkLoggedIn();
+
+      const response = await this.delayed(
+        this.got.get(`${this.getAliasDomain(alias)}/modules/preferences?mod=${module}`)
+      );
+      const $ = cheerio.load(response.body);
+
+      const heading = $('input[type=text]').attr('value');
+      const content = $('textarea').text();
+
+      return { heading, content };
+    } catch (err) {
+      this.#handleError(`Error while reading freetext module "${module}" of "${alias}"`, err, cThrowAndExit);
+    }
+  }
+
+  async getModuleSkins(alias, module) {
+    try {
+      this.#checkLoggedIn();
+
+      let response = await this.delayed(
+        this.got.get(`${this.getAliasDomain(alias)}/modules/preferences?mod=${module}`)
+      );
+      let $ = cheerio.load(response.body);
+      const heading = $('input[type=text]').eq(0).attr('value');
+
+      response = await this.delayed(this.got.get(`${this.getAliasDomain(alias)}/modules/skins?mod=${module}`));
+      $ = cheerio.load(response.body);
+      const skins = $('.skin > a')
+        .map((_i, el) => ({ name: el.attribs.name, url: el.attribs.href }))
+        .get();
+
+      return { heading, skins };
+    } catch (err) {
+      this.#handleError(`Error while reading freetext module "${module}" of "${alias}"`, err, cThrowAndExit);
+    }
+  }
 }
 
 exports.Twoday = Twoday;
