@@ -175,4 +175,4 @@ for (let skin of skins) {
 }
 ```
 
-> You can use `td.getSkin(skin)` to read the skin details such as decription and actual skin content.
+> You can use [getSkin(skin)](./docs/skins.md#get-a-specific-skin-and-related-data) to read the skin details such as decription and actual skin content.
