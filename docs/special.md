@@ -125,6 +125,8 @@ Param | Type | Text
 alias | string | the blog's alias
 module | string | a module name, e.g. modFreeText05
 
+> The module name must refer to a Twoday FreeText module such as modFreeText01 - 05 or modMacroFreeText01 - 03.
+
 - requires: successful login
 - requires: admin authorization for this alias
 - returns: tFreetext object
@@ -140,6 +142,34 @@ const td = new Twoday.Twoday('prod');
 await td.login();
 const { heading, content } = await td.getFreeTextModule('www', 'modFreeText01');
 console.log(heading, content);
+```
+
+### Update heading and HTML/text content of a freetext module
+#### .updateFreeTextModule(alias: string, module: string, options: tFreetext): Promise&lt;Response&gt;
+
+tFreetext Property | Type | Text
+--- | --- | --- 
+heading | string | heading/label to be used with the freetext module
+content | string | HTML/text code content of the module
+
+> The heading or content fields may be omitted or empty, e.g. to reset the freetext module.
+
+Param | Type | Text
+--- | --- | --- 
+alias | string | the blog's alias
+module | string | a module name, e.g. modFreeText05
+options | tFreetext | the module's heading and content as string
+
+- requires: successful login
+- requires: admin authorization for this alias
+- returns: Response
+
+#### Example: Update heading and content of modFreeText05
+```
+const td = new Twoday.Twoday('prod');
+await td.login();
+const res = await td.updateFreeTextModule('neonwilderness', 'modFreeText05', { header: 'Greeting', content: '<p>Hello World!</p>'});
+if (res.statusCode = 200) console.log('Update done!');
 ```
 
 ### Get heading and skin/s information of a non-freetext module

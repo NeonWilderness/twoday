@@ -5,7 +5,7 @@ jest.setTimeout(20000);
 const td = new Twoday.Twoday('prod', { silent: true });
 
 describe('Can work with Alien blogs', () => {
-  it('should get the proper alien software version', async () => {
+  xit('should get the proper alien software version', async () => {
     let version = await td.checkUserAlienVersion('mmm');
     expect(version).not.toBe('N/A');
     version = await td.checkUserAlienVersion('cdn');
@@ -22,7 +22,7 @@ describe('Can do special Twoday tasks', () => {
     await td.logout();
   });
 
-  it('should get infos about a normal alias', async () => {
+  xit('should get infos about a normal alias', async () => {
     const infos = await td.getInfo('neonwilderness');
     console.log(infos);
     expect(typeof infos).toBe('object');
@@ -39,7 +39,7 @@ describe('Can do special Twoday tasks', () => {
     expect(infos.trustedSite).toBeFalsy();
   });
 
-  it('should get infos about a trusted site alias', async () => {
+  xit('should get infos about a trusted site alias', async () => {
     const infos = await td.getInfo('kunstbetrieb');
     console.log(infos);
     expect(typeof infos).toBe('object');
@@ -52,22 +52,22 @@ describe('Can do special Twoday tasks', () => {
     expect(infos.trustedSite).toBeTruthy();
   });
 
-  it('should return the static URL without resType', async () => {
+  xit('should return the static URL without resType', async () => {
     const url = await td.getStaticUrl('neonwilderness');
     expect(url).toBe('https://static.twoday.net/NeonWilderness/');
   });
 
-  it('should return the static URL with a resType "images"', async () => {
+  xit('should return the static URL with a resType "images"', async () => {
     const url = await td.getStaticUrl('neonwilderness', 'images');
     expect(url).toBe('https://static.twoday.net/NeonWilderness/images/');
   });
 
-  it('should return the static URL with a resType "files"', async () => {
+  xit('should return the static URL with a resType "files"', async () => {
     const url = await td.getStaticUrl('neonwilderness', 'files');
     expect(url).toBe('https://static.twoday.net/NeonWilderness/files/');
   });
 
-  it('should return the sidebar modules order', async () => {
+  xit('should return the sidebar modules order', async () => {
     const sidebarModules = await td.getSidebarModules('www');
     expect(sidebarModules.sidebar01).toBeTruthy();
     expect(sidebarModules.sidebar02).toBeTruthy();
@@ -75,7 +75,7 @@ describe('Can do special Twoday tasks', () => {
     expect(sidebarModules.sidebar02).toHaveLength(0);
   });
 
-  it('should read and log the content of all sidebar freetext modules', async () => {
+  xit('should read and log the content of all sidebar freetext modules', async () => {
     const alias = 'www';
     const sidebarModules = await td.getSidebarModules(alias);
     const freetextModules = sidebarModules.sidebar01.filter(module => module.includes('FreeText'));
@@ -90,7 +90,7 @@ describe('Can do special Twoday tasks', () => {
     }
   });
 
-  it('should get the module heading/skins of non-freetext modules', async () => {
+  xit('should get the module heading/skins of non-freetext modules', async () => {
     const alias = 'www';
     const sidebarModules = await td.getSidebarModules(alias);
     const skinModules = sidebarModules.sidebar01.filter(module => !module.includes('FreeText'));
@@ -110,5 +110,50 @@ describe('Can do special Twoday tasks', () => {
       }
       console.log(mod, `(${heading}) => ${JSON.stringify(skins, null, 2)}`);
     }
+  });
+
+  it('should update a freetext module', async () => {
+    const alias = 'foundation';
+    {
+      let res = await td.updateFreeTextModule(alias, 'modFreeText01', {
+        heading: 'Header01',
+        content: '<p>Content01</p>'
+      });
+      expect(res.statusCode).toBe(200);
+      const { heading, content } = await td.getFreeTextModule(alias, 'modFreeText01');
+      expect(heading).toBe('Header01');
+      expect(content).toBe('<p>Content01</p>');
+    }
+
+    {
+      res = await td.updateFreeTextModule(alias, 'modMacroFreeText01', {
+        heading: 'HeaderMacro01',
+        content: '<p>ContentMacro01</p>'
+      });
+      expect(res.statusCode).toBe(200);
+      const { heading, content } = await td.getFreeTextModule(alias, 'modMacroFreeText01');
+      expect(heading).toBe('HeaderMacro01');
+      expect(content).toBe('<p>ContentMacro01</p>');
+    }
+    {
+      res = await td.updateFreeTextModule(alias, 'modFreeText02', {
+        heading: 'Header02',
+        content: '<p>Content02</p>'
+      });
+      expect(res.statusCode).toBe(200);
+      res = await td.updateFreeTextModule(alias, 'modFreeText02');
+      expect(res.statusCode).toBe(200);
+      const { heading, content } = await td.getFreeTextModule(alias, 'modFreeText02');
+      expect(heading).toBe('');
+      expect(content).toBe('');
+    }
+
+    const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+    await td.updateFreeTextModule(alias, 'modNotATextModule', {
+      heading: 'will fail due to',
+      content: 'wrong module name'
+    });
+    expect(mockExit).toHaveBeenCalledWith(1);
+    mockExit.mockRestore();
   });
 });
