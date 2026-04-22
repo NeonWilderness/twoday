@@ -6,7 +6,7 @@
 
 Twoday skins are organized in layouts. A blog can have multiple layouts, however only one layout is active at a time and is used to render the frontend.
 
-All skin function calls will target the currently active layout. If you want to adress skins in a non-active layout, you <u>must</u> call the [useLayout() function](./docs/layouts.md#switch-to-a-specific-layout-eg-for-subsequent-skin-calls) before utilizing any subsequent skin functions!
+All skin function calls will target the currently active layout. If you want to adress skins in a non-active layout, you <u>must</u> call the [useLayout() function](./layouts.md#switch-to-a-specific-layout-eg-for-subsequent-skin-calls) before utilizing any subsequent skin functions!
 
 > *Please be aware, that the code examples below are very condensed and intentionally omit the recommended try..catch construct as well as the async framing.*
 <hr>
@@ -68,7 +68,7 @@ console.log(`Skin ${s.prototype}.${s.name} is ${s.isModified ? '' : 'not '}modif
 ### Get a specific skin (and related data)
 #### .getSkin(skin: tSkin): Promise&lt;tSkinEnriched&gt;
 
-getSkin() is a low-level function used by functions such as createSkin(), updateSkin() or deleteSkin().
+getSkin() is a low-level function used by functions such as createSkin(), updateSkin() and deleteSkin().
 
 tSkin Param | Type | Text
 --- | --- | --- 

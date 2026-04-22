@@ -101,8 +101,7 @@ Param | Type | Text
 alias | string | the blog's alias
 
 - requires: successful login
-- requires: admin authorization for this alias
-- returns: Array of tMember object
+- returns: tSidebar object
 
 tSidebar Property | Type | Text
 --- | --- | --- 
@@ -114,7 +113,7 @@ sidebar02 | array | array of module names (string), e.g. modFreeText05, ...
 const td = new Twoday.Twoday('prod');
 await td.login();
 const sidebarModules = await td.getSidebarModules('www');
-console.log(JSON.stringify(sidebarModules, null, 2));
+console.log(`These modules are utilized in Sidebar01: ${sidebarModules.sidebar01.join(', ')}.`);
 ```
 
 ### Get heading and HTML/text content of a freetext module
@@ -152,7 +151,7 @@ tFreetext Property | Type | Text
 heading | string | heading/label to be used with the freetext module
 content | string | HTML/text code content of the module
 
-> The heading or content fields may be omitted or empty, e.g. to reset the freetext module.
+> The heading or content fields may be omitted or empty, e.g. to initialize the freetext module. In this case, *options* can be omitted completely.
 
 Param | Type | Text
 --- | --- | --- 
@@ -161,7 +160,6 @@ module | string | a module name, e.g. modFreeText05
 options | tFreetext | the module's heading and content as string
 
 - requires: successful login
-- requires: admin authorization for this alias
 - returns: Response
 
 #### Example: Update heading and content of modFreeText05
@@ -205,4 +203,4 @@ for (let skin of skins) {
 }
 ```
 
-> You can use [getSkin(skin)](./docs/skins.md#get-a-specific-skin-and-related-data) to read the skin details such as decription and actual skin content.
+> You can use [getSkin(skin)](./skins.md#get-a-specific-skin-and-related-data) to read the skin details such as decription and actual skin content.

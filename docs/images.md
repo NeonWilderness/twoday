@@ -26,7 +26,7 @@ url | string | the image's url
 
 > If a layout name is passed, a list of current layout images will be returned.
 
-> This is a syntactic sugar function to the generic info provider function *[listItems()](./docs/helper.md#get-a-list-of-files-or-images)*.
+> This is a syntactic sugar function to the generic info provider function *[listItems()](./helper.md#get-a-list-of-files-or-images)*.
 
 #### Example: Log out all jpg images of blog alias 'neonwilderness'
 ```
