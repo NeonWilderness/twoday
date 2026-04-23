@@ -54,37 +54,35 @@ describe('Can work with Twoday skins', () => {
   });
 
   it('should detect a valid hoptype', () => {
-    return td.isValidHoptype('site.something')
-      .then(result => {
-        expect(typeof result).toBe('object');
-        expect(result).toHaveProperty('valid', true);
-        expect(result).toHaveProperty('prototype', 'site');
-        expect(result).toHaveProperty('name', 'something');
-      });
+    return td.isValidHoptype('site.something').then(result => {
+      expect(typeof result).toBe('object');
+      expect(result).toHaveProperty('valid', true);
+      expect(result).toHaveProperty('prototype', 'site');
+      expect(result).toHaveProperty('name', 'something');
+    });
   });
 
   it('should understand an uppercase hoptype', () => {
-    return td.isValidHoptype('StOrY.display')
-      .then(result => {
-        expect(typeof result).toBe('object');
-        expect(result).toHaveProperty('valid', true);
-        expect(result).toHaveProperty('prototype', 'story');
-        expect(result).toHaveProperty('name', 'display');
-      });
+    return td.isValidHoptype('StOrY.display').then(result => {
+      expect(typeof result).toBe('object');
+      expect(result).toHaveProperty('valid', true);
+      expect(result).toHaveProperty('prototype', 'story');
+      expect(result).toHaveProperty('name', 'display');
+    });
   });
 
   it('should detect an invalid hoptype', () => {
-    return td.isValidHoptype('xxx.wrongHopType')
-      .then(result => {
-        expect(typeof result).toBe('object');
-        expect(result).toHaveProperty('valid', false);
-        expect(result).toHaveProperty('prototype', 'xxx');
-        expect(result).toHaveProperty('name', 'wrongHopType');
-      });
+    return td.isValidHoptype('xxx.wrongHopType').then(result => {
+      expect(typeof result).toBe('object');
+      expect(result).toHaveProperty('valid', false);
+      expect(result).toHaveProperty('prototype', 'xxx');
+      expect(result).toHaveProperty('name', 'wrongHopType');
+    });
   });
 
   it('should return skin data via GET', () => {
-    return td.login()
+    return td
+      .login()
       .then(() => td.getModifiedSkins('neonwilderness'))
       .then(skins => td.getSkin(skins[skins.length - 1]))
       .then(data => {
@@ -105,14 +103,17 @@ describe('Can work with Twoday skins', () => {
 
   it('should create and delete a new skin', () => {
     const rnd = Math.floor(Math.random() * 20);
-    const skin = `Site.something${rnd.toString().padStart(2,'0')}`;
-    return td.login()
+    const skin = `Site.something${rnd.toString().padStart(2, '0')}`;
+    return td
+      .login()
       .then(() => td.createSkin(alias, skin))
       .then(() => td.isModifiedSkin(alias, skin))
-      .then(result => td.getSkin({
-        name: result.name,
-        url: result.url
-      }))
+      .then(result =>
+        td.getSkin({
+          name: result.name,
+          url: result.url
+        })
+      )
       .then(data => {
         expect(data.title).toContain(skin);
         expect(data.description).toContain(skin);
@@ -120,16 +121,26 @@ describe('Can work with Twoday skins', () => {
         return td.deleteSkin(alias, skin);
       })
       .then(() => td.isModifiedSkin(alias, skin))
-      .then(result => expect(result.isModified).toBeFalsy())
+      .then(result => expect(result.isModified).toBeFalsy());
   });
 
   it('should update and log diff an existing skin', () => {
     const skinName = 'Site.something08';
-    return td.login()
-      .then(() => td.updateSkin(alias, skinName, {
+    return td.login().then(() =>
+      td.updateSkin(alias, skinName, {
         description: `This is an updated test skin used by the twoday npm module (version ${td.version}).`,
         skin: '<div>An updated version is here.</div>',
         diff: true
-      }))
+      })
+    );
+  });
+
+  it('should read a standard (not modified) skin', async () => {
+    const skinName = 'Site.legalRefs';
+    await td.login();
+    const layoutUrl = await td.getActiveLayoutUrl('www');
+    const skin = await td.getSkin({ name: skinName, url: `${layoutUrl}/skins/edit?key=Site.legalRefs` });
+    console.log(skin.skin);
+    expect(skin.skin).toBeTruthy();
   });
 });
