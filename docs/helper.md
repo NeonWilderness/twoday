@@ -125,7 +125,7 @@ module | string | a sidebar freetext module name, e.g. modFreeText01
 
 #### Example
 ```
-const isValid = ts.isValidFreeTextModule('modWrongName');
+const isValid = td.isValidFreeTextModule('modWrongName');
 console.log(isValid); // false
 ```
 <hr>
