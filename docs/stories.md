@@ -180,15 +180,15 @@ console.log(`Story "${story.id}" successfully updated (code=${res.statusCode}).`
 <hr>
 
 ### Get all topics being utilized in a blog/alias
-#### .getStoryTopics(alias: string): Promise&lt;tNameUrl[]&gt;
+#### .getStoryTopics(alias: string): Promise&lt;tTopicUrl[]&gt;
 
 Param | Type | Text
 --- | --- | --- 
 alias | string | the blog's alias
 
-- returns: Array of tNameUrl
+- returns: Array of tTopicUrl
 
-tNameUrl Property | Type | Text
+tTopicUrl Property | Type | Text
 --- | --- | --- 
 name | string | topic text
 url | string | url of the topic

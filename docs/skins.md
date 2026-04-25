@@ -12,7 +12,7 @@ All skin function calls will target the currently active layout. If you want to 
 <hr>
 
 ### Get a list of modified skins
-#### .getModifiedSkins(alias: string) : Promise&lt;tNameUrl[]&gt;
+#### .getModifiedSkins(alias: string) : Promise&lt;tSkin[]&gt;
 
 Param | Type | Text
 --- | --- | --- 
@@ -21,7 +21,7 @@ alias | string | a blog's alias
 - requires: successful login
 - returns: array of tNameUrl object
 
-tNameUrl Property | Type | Text
+tSkin Property | Type | Text
 --- | --- | --- 
 name | string | skin qualifier, e.g. *Site.style*
 url | string | url of the skin

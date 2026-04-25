@@ -114,6 +114,22 @@ Example results in:
 ```
 <hr>
 
+### Checks if a given freetext module name is valid
+#### .isValidFreeTextModule(module: string): boolean;
+
+- returns: boolean
+
+Param | Type | Text
+--- | --- | --- 
+module | string | a sidebar freetext module name, e.g. modFreeText01
+
+#### Example
+```
+const isValid = ts.isValidFreeTextModule('modWrongName');
+console.log(isValid); // false
+```
+<hr>
+
 ### Get a list of files or images
 #### .listItems(alias: string, resType: tResType) : Promise&lt;tResourceInfo[]&gt;
 

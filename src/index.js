@@ -1216,6 +1216,14 @@ class Twoday {
     }
   }
 
+  isValidFreeTextModule(module) {
+    const validNames = [
+      ...Array.from({ length: 5 }, (e, i) => `modFreeText${(++i).toString().padStart(2, '0')}`),
+      ...Array.from({ length: 3 }, (e, i) => `modMacroFreeText${(++i).toString().padStart(2, '0')}`)
+    ];
+    return validNames.includes(module);
+  }
+
   async getFreeTextModule(alias, module) {
     try {
       this.#checkLoggedIn();
@@ -1231,6 +1239,31 @@ class Twoday {
       return { heading, content };
     } catch (err) {
       this.#handleError(`Error while reading freetext module "${module}" of "${alias}"`, err, cThrowAndExit);
+    }
+  }
+
+  async updateFreeTextModule(alias, module, options = {}) {
+    try {
+      this.#checkLoggedIn();
+      if (!this.isValidFreeTextModule(module)) throw new Error(`Cannot update "${module}" as it is no FreeText module!`);
+
+      const moduleUrl = `${this.getAliasDomain(alias)}/modules/preferences?mod=${module}`;
+      const response = await this.delayed(this.got.get(moduleUrl));
+
+      const propHeader = `${module.toLowerCase()}header`;
+      const propText = `${module}Text`;
+      const form = {
+        secretKey: this.#getSecretKey(response.body),
+        mod: module,
+        preferencesform: 1,
+        submit: 'Sichern'
+      };
+      form[propHeader] = options.heading || ' ';
+      form[propText] = options.content || '';
+
+      return await this.delayed(this.got.post(moduleUrl, { form }));
+    } catch (err) {
+      this.#handleError(`Error while updating freetext module "${module}" of "${alias}"`, err, cThrowAndExit);
     }
   }
 
@@ -1253,33 +1286,6 @@ class Twoday {
       return { heading, skins };
     } catch (err) {
       this.#handleError(`Error while reading freetext module "${module}" of "${alias}"`, err, cThrowAndExit);
-    }
-  }
-
-  async updateFreeTextModule(alias, module, options = {}) {
-    try {
-      this.#checkLoggedIn();
-      // check for modFreeTextnn or modMacroFreeTextnn module
-      if (!/FreeText\d{2}/.test(module))
-        throw new Error(`Cannot update "${module}" as it is no FreeText module!`);
-
-      const moduleUrl = `${this.getAliasDomain(alias)}/modules/preferences?mod=${module}`;
-      const response = await this.delayed(this.got.get(moduleUrl));
-
-      const propHeader = `${module.toLowerCase()}header`;
-      const propText = `${module}Text`;
-      const form = {
-        secretKey: this.#getSecretKey(response.body),
-        mod: module,
-        preferencesform: 1,
-        submit: 'Sichern'
-      };
-      form[propHeader] = options.heading || ' ';
-      form[propText] = options.content || '';
-
-      return await this.delayed(this.got.post(moduleUrl, { form }));
-    } catch (err) {
-      this.#handleError(`Error while updating freetext module "${module}" of "${alias}"`, err, cThrowAndExit);
     }
   }
 }

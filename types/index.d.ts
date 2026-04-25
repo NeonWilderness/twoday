@@ -21,7 +21,7 @@ export interface tIsModifiedSkin extends tIsValidHoptype {
   isModified: boolean;
   url: string;
 }
-export interface tNameUrl {
+export interface tTopicUrl {
   name: string;
   url: string;
 }
@@ -130,6 +130,21 @@ export interface tAliasInfo {
   trustedSite: boolean;
 }
 
+export interface tSidebar {
+  sidebar01: string[];
+  sidebar02: string[];
+}
+
+export interface tFreetext {
+  heading: string;
+  content: string;
+}
+
+export interface tModuleSkins {
+  heading: string;
+  skins: tSkin[];
+}
+
 export declare class Twoday {
   constructor(platform: tPlatform, userOptions?: tUserOptions);
   #checkLoggedIn(): void;
@@ -149,7 +164,7 @@ export declare class Twoday {
   isValidHoptype(skinName: string): Promise<tIsValidHoptype>;
   listItems(alias: string, resType: tResType): Promise<tResourceInfo[]>;
   // skins
-  getModifiedSkins(alias: string): Promise<tNameUrl[]>;
+  getModifiedSkins(alias: string): Promise<tSkin[]>;
   isModifiedSkin(alias: string, skinName: string): Promise<tIsModifiedSkin>;
   getSkin(skin: tSkin): Promise<tSkinEnriched>;
   postSkin(skin: tSkinEnriched): Promise<Response>;
@@ -180,16 +195,23 @@ export declare class Twoday {
   hasStory(alias: string, id: string): Promise<boolean>;
   createStory(alias: string, story: tStoryInfo): Promise<tStoryKeys>;
   updateStory(alias: string, story: tStoryInfo): Promise<Response>;
-  getStoryTopics(alias: string): Promise<tNameUrl[]>;
+  getStoryTopics(alias: string): Promise<tTopicUrl[]>;
   // layout
   #getLayoutData(alias: string): Promise<tLayoutData>;
-  #validateLayout(alias:string, layout: string): void;
+  #validateLayout(alias: string, layout: string): void;
   getLayout(alias: string, refresh?: boolean): Promise<tLayoutData>;
   getActiveLayoutUrl(alias: string): Promise<string>;
   getActiveLayoutName(alias: string): Promise<string>;
   getLayoutNames(alias: string): Promise<string[]>;
   useLayout(alias: string, layoutName: string): Promise<tLayoutData>;
   downloadLayout(alias: string, layout: tLayoutInfo): Promise<Response>;
+  // modules
+  getSidebarModules(alias: string): Promise<tSidebar>;
+  isValidFreeTextModule(module: string): boolean;
+  getFreeTextModule(alias: string, module: string): Promise<tFreetext>;
+  updateFreeTextModule(alias: string, module: string, options?: tFreetext): Promise<Response>;
+  getModuleSkins(alias: string, module: string): Promise<tModuleSkins>;
+
   // special
   checkUserAlienVersion(alias: string): Promise<tAlienVersion>;
   getInfo(alias: string): Promise<tAliasInfo>;
