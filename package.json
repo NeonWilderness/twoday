@@ -4,7 +4,16 @@
   "description": "Module to help interact with the most relevant functions of the Twoday blogger platform",
   "main": "./src/index.js",
   "types": "./types/index.d.ts",
-  "files": ["src", "docs", "types", ".env.example", "CHANGELOG.md", "LICENSE", "pack*.json", "README.md"],
+  "files": [
+    "src",
+    "docs",
+    "types",
+    ".env.example",
+    "CHANGELOG.md",
+    "LICENSE",
+    "pack*.json",
+    "README.md"
+  ],
   "scripts": {
     "update": "ncu -u -x chalk,got && npm i",
     "test": "jest"
@@ -24,9 +33,9 @@
   },
   "homepage": "https://github.com/NeonWilderness/twoday#readme",
   "devDependencies": {
+    "//": "jest needs to be globally installed",
     "@types/jest": "^30.0.0",
-    "dotenv-safe": "^9.1.0",
-    "jest": "^30.3.0"
+    "dotenv-safe": "^9.1.0"
   },
   "dependencies": {
     "chalk": "^4.1.2",
