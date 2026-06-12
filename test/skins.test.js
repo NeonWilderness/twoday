@@ -21,9 +21,13 @@ describe('Can work with Twoday skins', () => {
         expect(Array.isArray(skins)).toBeTruthy();
         expect(skins.length).toBeTruthy();
         let keys = Object.keys(skins[0]);
-        expect(keys).toHaveLength(2);
+        expect(keys).toHaveLength(4);
         expect(keys).toContain('url');
         expect(keys).toContain('name');
+        expect(keys).toContain('modified');
+        expect(keys).toContain('modifier');
+        expect(skins[0].modified).toBe('27.02.2026 16:59');
+        expect(skins[0].modifier).toBe('NeonWilderness');
       });
   });
 

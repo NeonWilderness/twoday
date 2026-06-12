@@ -280,11 +280,16 @@ class Twoday {
 
       const $ = cheerio.load(response.body);
       const modSkins = $('.skin>a');
-      if (!modSkins) return [];
+      if (!modSkins.length) return [];
       return modSkins
         .map(function (_i, el) {
           const $el = $(el);
-          return { name: $el.attr('name'), url: $el.attr('href') };
+          let modified = '';
+          let modifier = '';
+          const text = $el.next().find('.small').text();
+          const m = text.match(/(\d{2}\.\d{2}\.\d{4}\s\d{2}:\d{2}),\s(\w*)/);
+          if (m) [, modified, modifier] = m;
+          return { name: $el.attr('name'), url: $el.attr('href'), modified, modifier };
         })
         .get();
     } catch (err) {
