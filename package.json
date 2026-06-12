@@ -1,6 +1,6 @@
 {
   "name": "@neonwilderness/twoday",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Module to help interact with the most relevant functions of the Twoday blogger platform",
   "main": "./src/index.js",
   "types": "./types/index.d.ts",
@@ -33,7 +33,6 @@
   },
   "homepage": "https://github.com/NeonWilderness/twoday#readme",
   "devDependencies": {
-    "//": "jest needs to be globally installed",
     "@types/jest": "^30.0.0",
     "dotenv-safe": "^9.1.0"
   },
