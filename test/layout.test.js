@@ -10,7 +10,7 @@ const layoutName = 'alien';
 
 describe('Can work with Twoday layouts', () => {
   beforeAll(async () => {
-    await td.login({ silent: true });
+    await td.login();
   });
 
   afterAll(async () => {

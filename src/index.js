@@ -81,7 +81,10 @@ class Twoday {
 
   getAliasDomain(alias) {
     if (!alias) throw new Error('Alias must not be empty!');
-    return `https://${alias}.${this.fullDomain}`;
+    if (alias === 'sysmgr')
+      return this.baseUrl;
+    else 
+      return `https://${alias}.${this.fullDomain}`;
   }
 
   async getStaticUrl(alias, resType) {
@@ -330,10 +333,11 @@ class Twoday {
     const layoutLinks = $('a[href*="download"]');
     const url = $('.level2 a.active').eq(0).attr('href');
     const activeLayoutUrl = this.fixURL(url.split('/').slice(0, -1).join('/'));
+    const activeLayoutName = alias === 'sysmgr' ? '' : activeLayoutUrl.split('/').pop();
 
     this.layout[alias] = {
       activeLayoutUrl,
-      activeLayoutName: activeLayoutUrl.split('/').pop(),
+      activeLayoutName,
       layoutNames: Array.from(layoutLinks).map(a => a.attribs.href.match(/layouts\/([\w-]*)\//)[1])
     };
     return this.layout[alias];
@@ -371,7 +375,10 @@ class Twoday {
       const layout = await this.getLayout(alias);
       assert.ok(layout.layoutNames.includes(layoutName), new Error(`Layout "${alias}/${layoutName}" does not exist!`));
 
-      if (layout.activeLayoutName !== layoutName) {
+      if (alias === 'sysmgr') {
+        layout.activeLayoutUrl = `${this.baseUrl}/layouts/${layoutName}`;
+        layout.activeLayoutName = layoutName;
+      } else if (layout.activeLayoutName !== layoutName) {
         let parts = layout.activeLayoutUrl.split('/');
         parts.splice(-1, 1, layoutName);
         layout.activeLayoutUrl = parts.join('/');
